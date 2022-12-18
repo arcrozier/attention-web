@@ -3,9 +3,14 @@ import logo from './icon.svg';
 import gear from './settings.svg';
 import './App.css';
 import {Button, Container, Navbar} from "react-bootstrap";
+import {Outlet, useOutletContext} from "react-router-dom";
 
-function openSettings() {
-    // TODO
+export interface Properties {
+    darkMode: boolean
+}
+
+export function useProps() {
+    return useOutletContext<Properties>()
 }
 
 function App() {
@@ -28,13 +33,9 @@ function App() {
                     />{' '}
                     Attention
                 </Navbar.Brand>
-                <Navbar.Text className={"justify-content-end"}>
-                    <button onClick={openSettings}>
-                        <img src={gear} alt={"Settings"}/>
-                    </button>
-                </Navbar.Text>
             </Container>
         </Navbar>
+        <Outlet context={{darkMode: darkMode}}/>
     </div>
   );
 }
