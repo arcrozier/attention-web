@@ -1,24 +1,40 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {useState} from 'react';
+import logo from './icon.svg';
+import gear from './settings.svg';
 import './App.css';
+import {Button, Container, Navbar} from "react-bootstrap";
+
+function openSettings() {
+    // TODO
+}
 
 function App() {
+  const [darkMode, setDarkMode] = useState(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    setDarkMode(e.matches)
+  });
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+        <Navbar bg={"primary"} variant={darkMode ? "dark" : "light"} sticky={"top"}>
+            <Container>
+                <Navbar.Brand href="#home">
+                    <img
+                        alt=""
+                        src={logo}
+                        width="30"
+                        height="30"
+                        className="d-inline-block align-top"
+                    />{' '}
+                    Attention
+                </Navbar.Brand>
+                <Navbar.Text className={"justify-content-end"}>
+                    <button onClick={openSettings}>
+                        <img src={gear} alt={"Settings"}/>
+                    </button>
+                </Navbar.Text>
+            </Container>
+        </Navbar>
     </div>
   );
 }
