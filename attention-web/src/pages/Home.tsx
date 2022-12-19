@@ -1,8 +1,8 @@
-import React, {useState} from "react";
-import {Button, Container, Navbar} from "react-bootstrap";
+import React from "react";
+import {Container, Navbar} from "react-bootstrap";
 import logo from "../icon.svg";
 import gear from "../settings.svg";
-import {Properties, useProps} from "../App";
+import {useProps} from "../App";
 import {Link} from "react-router-dom";
 
 
@@ -12,7 +12,7 @@ function Home() {
 
     return (
         <div className="App">
-            <Navbar bg={"primary"} variant={darkMode ? "dark" : "light"} sticky={"top"}>
+            <Navbar bg={"primary"} variant={darkMode ? "light" : "dark"} sticky={"top"}>
                 <Container>
                     <Navbar.Brand href="#home">
                         <img
@@ -25,7 +25,7 @@ function Home() {
                         Attention
                     </Navbar.Brand>
                     <Navbar.Text className={"justify-content-end"}>
-                        <Link className={'btn btn-primary'} to={`settings`}>
+                        <Link className={'btn btn-primary day-night'} to={`settings`}>
                                 <img src={gear} alt={"Settings"}/>
                             </Link>
                     </Navbar.Text>
