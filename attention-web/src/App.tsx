@@ -1,8 +1,6 @@
 import React, {useState} from 'react';
-import logo from './icon.svg';
-import gear from './settings.svg';
+import './colors.scss'
 import './App.css';
-import {Button, Container, Navbar} from "react-bootstrap";
 import {Outlet, useOutletContext} from "react-router-dom";
 
 export interface Properties {
@@ -21,20 +19,6 @@ function App() {
 
   return (
     <div className="App">
-        <Navbar bg={"primary"} variant={darkMode ? "dark" : "light"} sticky={"top"}>
-            <Container>
-                <Navbar.Brand href="#home">
-                    <img
-                        alt=""
-                        src={logo}
-                        width="30"
-                        height="30"
-                        className="d-inline-block align-top"
-                    />{' '}
-                    Attention
-                </Navbar.Brand>
-            </Container>
-        </Navbar>
         <Outlet context={{darkMode: darkMode}}/>
     </div>
   );

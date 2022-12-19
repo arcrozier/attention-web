@@ -25,11 +25,9 @@ function Home() {
                         Attention
                     </Navbar.Brand>
                     <Navbar.Text className={"justify-content-end"}>
-                        <Button>
-                            <Link to={`settings`}>
+                        <Link className={'btn btn-primary'} to={`settings`}>
                                 <img src={gear} alt={"Settings"}/>
                             </Link>
-                        </Button>
                     </Navbar.Text>
                 </Container>
             </Navbar>
