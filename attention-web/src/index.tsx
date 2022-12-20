@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
+import App, {userInfoLoader as rootLoader} from './App';
 import Login from './pages/Login'
 import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -15,6 +15,7 @@ const router = createBrowserRouter([
         path: "/",
         element: <App />,
         errorElement: <ErrorPage />,
+        loader: rootLoader,
         children: [
             {
                 index: true,
