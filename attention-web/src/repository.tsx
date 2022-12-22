@@ -12,3 +12,7 @@ export async function getUserInfo(): Promise<UserInfo> {
 export async function setCSRFToken(): Promise<any> {
     return axios.get(`${BASE_URL}/set_csrf/`)
 }
+
+export async function login(username: string, password: string): Promise<any> {
+    return axios.post(`${BASE_URL}/login_session/`, {username: username, password: password})
+}
