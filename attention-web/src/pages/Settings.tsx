@@ -1,9 +1,10 @@
-import {Properties, useProps} from "../App";
+import {Properties, useTitle, useProps} from "../App";
 
 
 function Settings() {
 
-    const {darkMode} = useProps()
+    const {darkMode, webApp} = useProps()
+    useTitle(webApp, 'Settings')
     // TODO
     return <p>Settings!</p>
 }

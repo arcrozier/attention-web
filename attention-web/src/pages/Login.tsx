@@ -1,9 +1,11 @@
-import {Properties, useProps} from "../App";
+import {Properties, useTitle, useProps} from "../App";
+import {useEffect} from "react";
 
 
 function Login() {
 
-    const {darkMode} = useProps()
+    const {darkMode, webApp} = useProps()
+    useTitle(webApp, 'Login')
     // TODO
     return <p>Login!</p>
 }

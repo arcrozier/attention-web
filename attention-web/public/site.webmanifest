@@ -1,7 +1,12 @@
 {
-    "name": "",
-    "short_name": "",
+    "name": "Attention! The aggressive instant-messaging app",
+    "short_name": "Attention!",
     "icons": [
+        {
+          "src": "/icon.svg",
+            "type": "image/svg+xml",
+            "sizes": "512x512"
+        },
         {
             "src": "/android-chrome-192x192.png",
             "sizes": "192x192",
@@ -13,7 +18,9 @@
             "type": "image/png"
         }
     ],
-    "theme_color": "#ffffff",
-    "background_color": "#ffffff",
+    "id": "com.aracroproducts.attentionv2-web",
+    "start_url": ".",
+    "theme_color": "#2740fd",
+    "background_color": "#000000",
     "display": "standalone"
 }

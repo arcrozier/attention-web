@@ -1,14 +1,18 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {Container, Navbar} from "react-bootstrap";
 import logo from "../icon.svg";
 import gear from "../settings.svg";
-import {useProps} from "../App";
+import {useTitle, useProps} from "../App";
 import {Link} from "react-router-dom";
 
 
 function Home() {
 
-    const {darkMode} = useProps()
+    const {darkMode, webApp} = useProps()
+
+    useTitle(webApp, 'Home')
+
+    // TODO reload?
 
     return (
         <div className="App">
