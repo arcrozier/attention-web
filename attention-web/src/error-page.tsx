@@ -1,9 +1,17 @@
-import {Link, useRouteError} from "react-router-dom";
+import {isRouteErrorResponse, Link, useRouteError} from "react-router-dom";
 import {Button} from "react-bootstrap";
 
 export default function ErrorPage() {
     const error = useRouteError() as any;
-    console.error(error);
+
+    if (isRouteErrorResponse(error)) {
+        if (error.status === 403) {
+            window.location.replace("/login")
+            return (<div id={"error-page"}>
+                <p>Taking you to the <Link to={"/login"}>login page</Link>...</p>
+            </div>)
+        }
+    }
 
     return (
         <div id="error-page">

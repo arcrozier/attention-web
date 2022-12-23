@@ -36,8 +36,7 @@ export interface UserInfo {
 }
 
 export async function userInfoLoader() {
-    const userInfo = await getUserInfo()
-    return userInfo
+    return await getUserInfo()
 }
 
 export function useProps() {
