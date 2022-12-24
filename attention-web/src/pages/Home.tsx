@@ -1,9 +1,10 @@
-import React, {useEffect} from "react";
+import React from "react";
 import {Container, Navbar} from "react-bootstrap";
 import logo from "../icon.svg";
 import gear from "../settings.svg";
-import {useTitle, useProps} from "../App";
+import {useProps} from "../App";
 import {Link} from "react-router-dom";
+import {useTitle} from "../Root";
 
 
 function Home() {

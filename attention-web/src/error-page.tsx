@@ -1,11 +1,12 @@
 import {isRouteErrorResponse, Link, useRouteError} from "react-router-dom";
 import {Button} from "react-bootstrap";
+import {AxiosError} from "axios";
 
 export default function ErrorPage() {
     const error = useRouteError() as any;
 
-    if (isRouteErrorResponse(error)) {
-        if (error.status === 403) {
+    if (error instanceof AxiosError) {
+        if (error.response?.status === 403) {
             window.location.replace("/login")
             return (<div id={"error-page"}>
                 <p>Taking you to the <Link to={"/login"}>login page</Link>...</p>

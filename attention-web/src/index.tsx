@@ -9,28 +9,36 @@ import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import ErrorPage from "./error-page";
 import Home from "./pages/Home";
 import Settings from "./pages/Settings";
+import Root from "./Root";
 
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <App />,
+        element: <Root />,
         errorElement: <ErrorPage />,
-        loader: rootLoader,
         children: [
             {
-                index: true,
-                element: <Home />
+                path: "/",
+                element: <App />,
+                loader: rootLoader,
+                children: [
+                    {
+                        index: true,
+                        element: <Home />
+                    },
+                    {
+                        path: "/settings",
+                        element: <Settings />
+                    }
+                ]
             },
             {
                 path: "/login",
                 element: <Login />
-            },
-            {
-                path: "/settings",
-                element: <Settings />
             }
         ]
-    },
+    }
+
 ]);
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(

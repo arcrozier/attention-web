@@ -1,14 +1,14 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import './colors.scss'
 import './App.css';
 import {Outlet, useLoaderData, useOutletContext} from "react-router-dom";
 import {getUserInfo} from "./repository";
+import {Properties, useProps as useRootProps} from "./Root";
 
 // TODO https://create-react-app.dev/docs/making-a-progressive-web-app/
 // offline support - support cached friends? No
-export interface Properties {
-    darkMode: boolean,
-    webApp: boolean,
+
+export interface AppProperties extends Properties {
     userInfo: UserInfo | null
 }
 
@@ -43,35 +43,26 @@ export async function userInfoLoader() {
 }
 
 export function useProps() {
-    return useOutletContext<Properties>()
-}
-
-export function useTitle(webApp: boolean, page: string) {
-    useEffect(() => {
-        document.title = (webApp ? '' : 'Attention! ') + page
-    })
+    return useOutletContext<AppProperties>()
 }
 
 function App() {
-  const [darkMode, setDarkMode] = useState(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
-    const isWebApp = (window.matchMedia('(display-mode: standalone)').matches);
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-    setDarkMode(e.matches)
-  });
 
-  const userInfo = useLoaderData() as UserInfo | null
+    const userInfo = useLoaderData() as UserInfo | null
 
-  const props: Properties = {
-      darkMode: darkMode,
-      webApp: isWebApp,
-      userInfo: userInfo
-  }
+    const {darkMode, webApp} = useRootProps()
 
-  return (
-    <div className="App">
-        <Outlet context={props}/>
-    </div>
-  );
+    const props: AppProperties = {
+        darkMode: darkMode,
+        webApp: webApp,
+        userInfo: userInfo
+    }
+
+    return (
+        <div className="App">
+            <Outlet context={props}/>
+        </div>
+    );
 }
 
 export default App;
