@@ -13,6 +13,7 @@
     "axios": "^1.2.1",
     "bootstrap": "^5.2.3",
     "dotenv": "^16.0.3",
+    "js-cookie": "^3.0.1",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.0",
     "react-dom": "^18.2.0",
@@ -46,6 +47,7 @@
     ]
   },
   "devDependencies": {
+    "@types/js-cookie": "^3.0.2",
     "@webpack-cli/generators": "^3.0.1",
     "css-loader": "^6.7.3",
     "sass": "^1.57.0",
