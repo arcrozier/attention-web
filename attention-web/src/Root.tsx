@@ -13,7 +13,7 @@ export function useProps() {
 
 export default function Root() {
     const [darkMode, setDarkMode] = useState(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
-    const isWebApp = (window.matchMedia('(display-mode: standalone)').matches);
+    const isWebApp = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
         setDarkMode(e.matches)
     });
