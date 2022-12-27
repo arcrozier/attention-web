@@ -1,6 +1,5 @@
 import {useTitle} from "../Root";
 import {useProps} from "../App";
-import {Outlet} from "react-router-dom";
 
 
 function Login() {

@@ -70,7 +70,7 @@ export default function Root() {
             setShowPrompt(false)
         }
         }>
-            <Close fill={"#FFFFFF"} height={"24px"} width={"24px"} />
+            <Close height={"24px"} width={"24px"} />
         </div>
         Download the app!</a>
 

@@ -1,13 +1,13 @@
 import {OverlayTrigger} from "react-bootstrap";
 
 export interface ImageProps {
-    fill: string,
+    fill?: string,
     alt?: string,
     height?: string,
     width?: string
 }
 
-export const Close = ({fill, alt="Close", height = "48px", width = "48px"}: ImageProps) => {
+export const Close = ({fill = "currentColor", alt = "Close", height = "48px", width = "48px"}: ImageProps) => {
 return (
     <div style={{height: height, width: width}}>
         <svg xmlns="http://www.w3.org/2000/svg"
