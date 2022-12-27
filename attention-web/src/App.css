@@ -20,3 +20,11 @@
 #error-page {
   text-align: center;
 }
+
+.center {
+  text-align: center;
+}
+
+html, body, #root {
+  height: 100%;
+}
