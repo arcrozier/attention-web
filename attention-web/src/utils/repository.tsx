@@ -1,4 +1,4 @@
-import {UserInfo} from "./App";
+import {UserInfo} from "../App";
 import axios from "./axios";
 import {AxiosResponse} from "axios";
 import Cookies from "js-cookie";

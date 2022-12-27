@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {useOutletContext, Outlet} from "react-router-dom";
 import Cookies from "js-cookie";
-import {Close} from "./Close";
+import {Close} from "./utils/images";
 
 
 export interface Properties {
@@ -16,7 +16,6 @@ export function useProps() {
 function supportsApp(): boolean {
 
     const stringAppSupport = (platform: string, userAgent: string): boolean => {
-        console.log(`Platform: ${platform} \n userAgent: ${userAgent}`)
         return (
                 platform.toLowerCase().includes('linux') && userAgent.toLowerCase().includes('cros')
             ) || platform.toLowerCase().includes('android') ||
@@ -48,12 +47,9 @@ export default function Root() {
         webApp: isWebApp
     }
 
-    const appBtn = <a className={'btn btn-primary'} style={{
+    const appBtn = <a className={'btn btn-primary center'} style={{
         width: "100%",
         height: "72pt",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
         borderRadius: 0,
         position: "sticky",
         bottom: "0px",

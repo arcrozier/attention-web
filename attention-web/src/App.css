@@ -21,8 +21,15 @@
   text-align: center;
 }
 
+.center-horizontal {
+  text-align: center;
+}
+
 .center {
   text-align: center;
+  justify-content: center;
+  display: flex;
+  align-items: center;
 }
 
 html, body, #root {

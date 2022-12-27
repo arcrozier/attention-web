@@ -2,7 +2,7 @@ import React from 'react';
 import './colors.scss'
 import './App.css';
 import {Outlet, useLoaderData, useOutletContext} from "react-router-dom";
-import {getUserInfo} from "./repository";
+import {getUserInfo} from "./utils/repository";
 import {Properties, useProps as useRootProps} from "./Root";
 
 // TODO https://create-react-app.dev/docs/making-a-progressive-web-app/
