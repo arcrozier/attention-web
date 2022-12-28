@@ -1,8 +1,8 @@
 import {useTitle} from "../Root";
 import {useProps} from "../App";
-import {Hide, Logo, Show} from "../utils/images";
+import {Logo} from "../utils/images";
 import React, {useState} from "react";
-import {IconButton, InputAdornment, TextField} from "@mui/material";
+import {IconButton, InputAdornment, TextField, Typography} from "@mui/material";
 import {Visibility, VisibilityOff} from "@mui/icons-material";
 
 
@@ -32,10 +32,11 @@ function Login() {
     return (
         <div style={{display: "flex", flexDirection: "column", height: "100%"}}>
             <div style={{flexShrink: 0, flexGrow: 1, flexDirection: "column"}} className={"center"}>
-                <Logo/>
-                <h1>Login</h1>
-                <TextField variant={"outlined"} value={username} onChange={usernameChanged}/>
-                <TextField variant={"outlined"} value={password} onChange={passwordChanged}
+                <Logo height={"10vh"} width={"10vh"}/>
+                <Typography variant={"h3"}>Login</Typography>
+                <div style={{height: "20pt"}} />
+                <TextField variant={"outlined"} margin="normal" label={"Username"} value={username} onChange={usernameChanged} className={"textfield-width"}/>
+                <TextField variant={"outlined"} margin="normal" label={"Password"} value={password} onChange={passwordChanged} className={"textfield-width"}
                            type={passwordShown ? "text" : "password"} name={"password"}
                            InputProps={{
                                endAdornment: <InputAdornment position="end">
@@ -46,6 +47,10 @@ function Login() {
                                    </IconButton>
                                </InputAdornment>
                            }}/>
+                {
+                    // TODO login button
+                    // TODO create account button
+                }
             </div>
             <footer className={"center-horizontal"}>
                 <a style={{textDecoration: "none", color: "inherit"}}

@@ -1,5 +1,4 @@
 import {isRouteErrorResponse, Link, useRouteError} from "react-router-dom";
-import {Button} from "react-bootstrap";
 import {AxiosError} from "axios";
 
 export default function ErrorPage() {

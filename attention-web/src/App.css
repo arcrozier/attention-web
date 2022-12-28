@@ -35,3 +35,14 @@
 html, body, #root {
   height: 100%;
 }
+
+.btn {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.textfield-width {
+  width: 200pt;
+  max-width: 100%;
+}

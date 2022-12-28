@@ -1,7 +1,14 @@
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useOutletContext, Outlet} from "react-router-dom";
 import Cookies from "js-cookie";
-import {Close} from "./utils/images";
+import {
+    createTheme,
+    IconButton,
+    responsiveFontSizes,
+    ThemeProvider, Typography,
+    useMediaQuery
+} from "@mui/material";
+import {Close} from "@mui/icons-material";
 
 
 export interface Properties {
@@ -34,11 +41,29 @@ function supportsApp(): boolean {
 }
 
 export default function Root() {
-    const [darkMode, setDarkMode] = useState(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
     const isWebApp = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-        setDarkMode(e.matches)
-    });
+
+    const darkMode = useMediaQuery('(prefers-color-scheme: dark)');
+
+    const theme = React.useMemo(
+        () =>
+            responsiveFontSizes(createTheme({
+                palette: {
+                    mode: darkMode ? 'dark' : 'light',
+                    primary: {
+                        main: "#2740fd",
+                        light: "#2740fd",
+                        dark: "#bbc2ff",
+                    },
+                    secondary: {
+                        main: "#a700b0",
+                        light: "#a700b0",
+                        dark: "#ffa9fa"
+                    }
+                },
+            })),
+        [darkMode],
+    );
 
     const [showPrompt, setShowPrompt] = useState(supportsApp() && Cookies.get("app-prompt") !== "false")
 
@@ -47,34 +72,52 @@ export default function Root() {
         webApp: isWebApp
     }
 
-    const appBtn = <a className={'btn btn-primary center'} style={{
+    const primaryColor = darkMode ? theme.palette.primary.dark : theme.palette.primary.light
+    const appBtn = <a className={'btn center'} style={{
         width: "100%",
         height: "72pt",
         borderRadius: 0,
         position: "sticky",
         bottom: "0px",
         flexGrow: 0,
-        flexShrink: 0
+        display: "flex",
+        flexShrink: 0,
+        flexDirection: "row",
+        backgroundColor: primaryColor,
+        color: theme.palette.getContrastText(primaryColor)
     }} href={'/app/'}>
-        <div style={{
+        <Typography variant={"button"}>
+            Download the app!
+        </Typography>
+
+        <IconButton aria-label={"close"} style={{
             position: "absolute",
             top: "0px",
             right: "0px",
-        }} onClick={ (e) => {
+            color: "inherit"
+        }} onClick={(e) => {
             e.preventDefault()
             Cookies.set("app-prompt", "false")
             setShowPrompt(false)
         }
         }>
-            <Close height={"24px"} width={"24px"} />
-        </div>
-        Download the app!</a>
+            <Close />
+        </IconButton>
+        </a>
 
     return (
-        <div style={{height: "100%", display: "flex", flexDirection: "column"}}>
-            <Outlet context={props}/>
-            {showPrompt && appBtn}
-        </div>
+        <ThemeProvider theme={theme}>
+            <div style={{
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                backgroundColor: theme.palette.background.default,
+                color: theme.palette.getContrastText(theme.palette.background.default)
+            }}>
+                <Outlet context={props}/>
+                {showPrompt && appBtn}
+            </div>
+        </ThemeProvider>
     )
 }
 

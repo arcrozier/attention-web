@@ -1,5 +1,4 @@
 import React from 'react';
-import './colors.scss'
 import './App.css';
 import {Outlet, useLoaderData, useOutletContext} from "react-router-dom";
 import {getUserInfo} from "./utils/repository";

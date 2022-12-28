@@ -4,7 +4,6 @@ import './index.css';
 import App, {userInfoLoader as rootLoader} from './App';
 import Login from './pages/Login'
 import reportWebVitals from './reportWebVitals';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import ErrorPage from "./pages/ErrorPage";
 import Home from "./pages/Home";
