@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App, {userInfoLoader as rootLoader} from './App';
-import Login from './pages/Login'
+import Login, {AuthRoot} from './pages/Login'
 import reportWebVitals from './reportWebVitals';
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import ErrorPage from "./pages/ErrorPage";
@@ -37,7 +37,19 @@ const router = createBrowserRouter([
             },
             {
                 path: "/login",
-                element: <Login />
+                element: <AuthRoot />,
+                children: [
+                    {
+                        index: true,
+                        element: <Login />
+                    },
+                    {
+                        path: "/create-account"
+                    },
+                    {
+                        path: "/choose-username"
+                    }
+                ]
             }
         ]
     }
