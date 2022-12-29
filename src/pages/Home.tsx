@@ -5,7 +5,9 @@ import {useTitle} from "../Root";
 
 function Home() {
 
-    const {webApp} = useProps()
+    const {webApp, userInfo} = useProps()
+
+    console.log(userInfo)
 
     useTitle(webApp, 'Home')
 

@@ -1,4 +1,4 @@
-import {isRouteErrorResponse, Link, useRouteError} from "react-router-dom";
+import {Link, useRouteError} from "react-router-dom";
 import {AxiosError} from "axios";
 
 export default function ErrorPage() {

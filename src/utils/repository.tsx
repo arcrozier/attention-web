@@ -5,6 +5,12 @@ import Cookies from "js-cookie";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL
 
+export interface APIResult<T> {
+    success: boolean,
+    message: string,
+    data: T | null
+}
+
 export const CSRF_COOKIE = 'csrftoken'
 
 async function requireCSRF() {
@@ -14,7 +20,7 @@ async function requireCSRF() {
 
 // authentication info: https://medium.com/swlh/django-rest-framework-and-spa-session-authentication-with-docker-and-nginx-aa64871f29cd
 // https://www.django-rest-framework.org/api-guide/authentication/#sessionauthentication
-export async function getUserInfo(): Promise<UserInfo> {
+export async function getUserInfo(): Promise<AxiosResponse<APIResult<UserInfo>>> {
     await requireCSRF()
     return axios.get(`${BASE_URL}get_info/`)
 }
@@ -26,5 +32,5 @@ export async function setCSRFToken(): Promise<AxiosResponse> {
 
 export async function login(username: string, password: string): Promise<any> {
     await requireCSRF()
-    return axios.post(`${BASE_URL}login_session/`, {username: username, password: password})
+    return axios.post(`${BASE_URL}login/`, {username: username, password: password})
 }

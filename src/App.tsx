@@ -1,8 +1,9 @@
 import React from 'react';
 import './App.css';
 import {Outlet, useLoaderData, useOutletContext} from "react-router-dom";
-import {getUserInfo} from "./utils/repository";
+import {APIResult, getUserInfo} from "./utils/repository";
 import {Properties, useProps as useRootProps} from "./Root";
+import {AxiosResponse} from "axios";
 
 // TODO https://create-react-app.dev/docs/making-a-progressive-web-app/
 // offline support - support cached friends? No
@@ -47,14 +48,14 @@ export function useProps() {
 
 function App() {
 
-    const userInfo = useLoaderData() as UserInfo | null
+    const userInfo = useLoaderData() as AxiosResponse<APIResult<UserInfo>>
 
     const {darkMode, webApp} = useRootProps()
 
     const props: AppProperties = {
         darkMode: darkMode,
         webApp: webApp,
-        userInfo: userInfo
+        userInfo: userInfo.data.data
     }
 
     return (
