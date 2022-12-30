@@ -3,7 +3,7 @@ import React from "react";
 export const LIST_ELEMENT_PADDING = "16pt"
 
 export const usernameChanged = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    const filtered = event.target.value.replaceAll(/[^a-zA-Z@_\-+.]/gm, '')
+    const filtered = event.target.value.replaceAll(/[^a-zA-Z0-9@_\-+.]/gm, '')
     return filtered.substring(0, 150)
 }
 

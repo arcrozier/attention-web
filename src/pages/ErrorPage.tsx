@@ -1,12 +1,22 @@
-import {Link, useRouteError} from "react-router-dom";
+import {Link, useNavigate, useRouteError} from "react-router-dom";
 import {AxiosError} from "axios";
+import {useEffect} from "react";
 
 export default function ErrorPage() {
     const error = useRouteError() as any;
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        if (error instanceof AxiosError) {
+            if (error.response?.status === 403) {
+                navigate('/login', {replace: true})
+            }
+        }
+    }, [error, navigate])
+
 
     if (error instanceof AxiosError) {
         if (error.response?.status === 403) {
-            window.location.replace("/login")
             return (<div id={"error-page"}>
                 <p>Taking you to the <Link to={"/login"}>login page</Link>...</p>
             </div>)

@@ -10,7 +10,7 @@ import {
     Typography
 } from "@mui/material";
 import {Check, Close, Visibility, VisibilityOff} from "@mui/icons-material";
-import {Outlet} from "react-router-dom";
+import {Outlet, redirect, useNavigate} from "react-router-dom";
 import {
     couldBeEmail,
     LIST_ELEMENT_PADDING,
@@ -69,6 +69,8 @@ export function Login() {
         message: ''
     })
 
+    const navigate = useNavigate()
+
     useGoogleSignIn()
 
     const handleClickShowPassword = () => {
@@ -80,7 +82,7 @@ export function Login() {
         setLoading(true)
 
         loginPromise.then(() => {
-            window.location.replace('/')
+            navigate('/', {replace: true})
         }).catch((error) => {
             if (error.response && error.response.status === 403) {
                 setPasswordStatus({error: true, message: 'Invalid username or password'})
@@ -194,6 +196,8 @@ export function CreateAccount() {
         setPasswordShown(!passwordShown)
     }
 
+    const navigate = useNavigate()
+
     const doCreateAccount = () => {
         try {
             setLoading(true)
@@ -218,7 +222,7 @@ export function CreateAccount() {
 
             createAccount(username, email, firstName, lastName, password, tosAgree).then(() => {
                 login(username, password).then(() => {
-                    location.replace('/')
+                    navigate('/', {replace: true})
                     }
                 )
                 }).catch((error) => {
