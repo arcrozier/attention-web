@@ -10,7 +10,7 @@ import {
     Typography
 } from "@mui/material";
 import {Check, Close, Visibility, VisibilityOff} from "@mui/icons-material";
-import {Outlet, redirect, useNavigate} from "react-router-dom";
+import {Outlet, useNavigate} from "react-router-dom";
 import {
     couldBeEmail,
     LIST_ELEMENT_PADDING,
