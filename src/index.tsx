@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App, {userInfoLoader as rootLoader} from './App';
-import {AuthRoot, Login} from './pages/Login'
+import {AuthRoot, CreateAccount, Login} from './pages/Login'
 import reportWebVitals from './reportWebVitals';
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import ErrorPage from "./pages/ErrorPage";
@@ -44,7 +44,8 @@ const router = createBrowserRouter([
                         element: <Login />
                     },
                     {
-                        path: "create-account/"
+                        path: "create-account/",
+                        element: <CreateAccount />
                     },
                     {
                         path: "choose-username/"

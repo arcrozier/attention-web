@@ -1,18 +1,26 @@
 import {useTitle, useProps} from "../Root";
 import {Logo} from "../utils/images";
 import React, {useEffect, useState} from "react";
-import {Button, Divider, IconButton, InputAdornment, TextField, Typography} from "@mui/material";
-import {Google, Visibility, VisibilityOff} from "@mui/icons-material";
+import {
+    Button, Checkbox,
+    Divider, FormControlLabel,
+    IconButton,
+    InputAdornment,
+    TextField,
+    Typography
+} from "@mui/material";
+import {Check, Close, Visibility, VisibilityOff} from "@mui/icons-material";
 import {Outlet} from "react-router-dom";
 import {
+    couldBeEmail,
     LIST_ELEMENT_PADDING,
-    passwordChanged,
+    stripNewlines,
     TextFieldStatus,
     usernameChanged
 } from "../utils/defs";
 import {LoadingButton} from "@mui/lab";
 import {Link} from "react-router-dom";
-import {login} from "../utils/repository";
+import {createAccount, login} from "../utils/repository";
 
 const useGoogleSignIn = () => {
     useEffect(() => {
@@ -96,7 +104,7 @@ export function Login() {
                  data-client_id="357995852275-tcfjuvtbrk3c57t5gsuc9a9jdfdn137s.apps.googleusercontent.com"
                  data-context="signin"
                  data-ux_mode="popup"
-                 data-callback="doGoogleSignIn"
+                 data-callback={doGoogleSignIn}
                  data-nonce=""
                  data-auto_select="true"
                  data-itp_support="true">
@@ -111,8 +119,8 @@ export function Login() {
             <div style={{height: LIST_ELEMENT_PADDING}}/>
             <TextField variant={"outlined"} label={"Password"} error={passwordStatus.error}
                        value={password} onChange={(e) => {
-                setPassword(passwordChanged(e))
-            }} className={"textfield-width"}
+                setPassword(stripNewlines(e))
+            }} helperText={passwordStatus.message} className={"textfield-width"}
                        type={passwordShown ? "text" : "password"} name={"password"}
                        InputProps={{
                            endAdornment: <InputAdornment position="end">
@@ -136,12 +144,6 @@ export function Login() {
             <Divider className={"textfield-width"}/>
 
             <div style={{height: LIST_ELEMENT_PADDING}}/>
-            <Button startIcon={<Google/>} variant={"outlined"} onClick={() => {
-                // TODO Google OAuth
-            }}>
-                Sign in with Google
-            </Button>
-
             <div className="g_id_signin"
                  data-type="standard"
                  data-shape="rectangular"
@@ -164,13 +166,154 @@ export function CreateAccount() {
 
     const {webApp} = useProps()
 
+    const [username, setUsername] = useState('')
+    const [password, setPassword] = useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
+    const [firstName, setFirstName] = useState('')
+    const [lastName, setLastName] = useState('')
+    const [email, setEmail] = useState('')
+    const [tosAgree, setTosAgree] = useState(false)
+    const [tosAgreeError, setTosAgreeError] = useState(false)
+    const [usernameStatus, setUsernameStatus] = useState<TextFieldStatus>({
+        error: false,
+        message: ''
+    })
+    const [passwordStatus, setPasswordStatus] = useState<TextFieldStatus>({
+        error: false,
+        message: ''
+    })
+    const [confirmPasswordStatus, setConfirmPasswordStatus] = useState<TextFieldStatus>({
+        error: false,
+        message: ''
+    })
+    const [emailStatus, setEmailStatus] = useState<TextFieldStatus>({error: false, message: ''})
+    const [passwordShown, setPasswordShown] = useState(false)
+    const [loading, setLoading] = useState(false)
+
+    const handleClickShowPassword = () => {
+        setPasswordShown(!passwordShown)
+    }
+
+    const doCreateAccount = () => {
+        try {
+            setLoading(true)
+            let valid = true
+            if (password.length < 8) {
+                valid = false
+                setPasswordStatus({error: true, message: 'Password must be at least 8 characters'})
+            }
+            if (password !== confirmPassword) {
+                valid = false
+                setConfirmPasswordStatus({error: true, message: 'Passwords must match'})
+            }
+            if (email.length !== 0 && !couldBeEmail(email)) {
+                valid = false
+                setEmailStatus({error: true, message: 'Enter valid email or leave blank'})
+            }
+            if (!tosAgree) {
+                valid = false
+                setTosAgreeError(true)
+            }
+            if (!valid) return;
+
+            createAccount(username, email, firstName, lastName, password, tosAgree).then(() => {
+                login(username, password).then(() => {
+                    location.replace('/')
+                    }
+                )
+                }).catch((error) => {
+                if (error.response && error.response.status === 400) {
+                    console.log(error)
+                    setPasswordStatus({error: true, message: 'Invalid username or password'})
+                } else {
+                    throw(error)
+                }
+            })
+        } finally {
+            setLoading(false)
+        }
+    }
+
     useTitle(webApp, 'Create Account')
 
     return (
         <div>
-            {
-                // TODO
-            }
+            <Typography variant={"h3"}>Login</Typography>
+            <div style={{height: LIST_ELEMENT_PADDING}}/>
+            <TextField variant={"outlined"} error={usernameStatus.error} label={"Username"}
+                       value={username} onChange={(e) => {
+                setUsername(usernameChanged(e))
+                setUsernameStatus({error: false, message: ''})
+            }} required={true} className={"textfield-width"} helperText={usernameStatus.message}/>
+
+            <div style={{height: LIST_ELEMENT_PADDING}}/>
+            <TextField variant={"outlined"} error={emailStatus.error} label={"Email"} value={email}
+                       onChange={(e) => {
+                           setEmail(stripNewlines(e))
+                           setEmailStatus({error: false, message: ''})
+                       }} className={"textfield-width"} required={false} helperText={emailStatus.message}/>
+
+            <div style={{height: LIST_ELEMENT_PADDING}}/>
+            <TextField variant={"outlined"} label={"First name"} value={firstName}
+                       onChange={(e) => {
+                           setFirstName(stripNewlines(e))
+                       }} className={"textfield-width"} required={false}/>
+
+            <div style={{height: LIST_ELEMENT_PADDING}}/>
+            <TextField variant={"outlined"} label={"Last name"} value={lastName} onChange={(e) => {
+                setLastName(stripNewlines(e))
+            }} className={"textfield-width"} required={false}/>
+
+            <div style={{height: LIST_ELEMENT_PADDING}}/>
+            <TextField variant={"outlined"} label={"Password"} error={passwordStatus.error}
+                       value={password} onChange={(e) => {
+                setPassword(stripNewlines(e))
+                setPasswordStatus({error: false, message: ''})
+            }} className={"textfield-width"} required={true}
+                       type={passwordShown ? "text" : "password"} name={"password"}
+                       InputProps={{
+                           endAdornment: <InputAdornment position="end">
+                               <IconButton
+                                   onClick={handleClickShowPassword}
+                               >
+                                   {passwordShown ? <Visibility/> : <VisibilityOff/>}
+                               </IconButton>
+                           </InputAdornment>
+                       }} helperText={passwordStatus.message}/>
+
+            <div style={{height: LIST_ELEMENT_PADDING}}/>
+            <TextField variant={"outlined"} label={"Confirm password"}
+                       error={confirmPasswordStatus.error}
+                       required={true}
+                       helperText={confirmPasswordStatus.message} value={confirmPassword} type={passwordShown ? "text" : "password"}
+                       onChange={(e) => {
+                           setConfirmPassword(stripNewlines(e))
+                           setConfirmPasswordStatus({error: false, message: ''})
+                       }} InputProps={{
+                endAdornment: <InputAdornment position="end">
+                    {confirmPassword.length === 0 ? null : (confirmPassword === password ?
+                        <Check color={"success"}/> : <Close color={"error"}/>)}
+                </InputAdornment>
+            }} onKeyPress={(event) => {
+                if (event.key === 'Enter') {
+                    doCreateAccount()
+                }
+            }}/>
+
+            <div style={{height: LIST_ELEMENT_PADDING}}/>
+            <FormControlLabel control={<Checkbox checked={tosAgree} onChange={() => {
+                setTosAgree(!tosAgree)
+                setTosAgreeError(false)
+            }} required={true} color={tosAgreeError ? "error" : "primary"}/>}
+            label={
+                <p>
+                    I have read and agree to the <a href={"https://aracroproducts.com/legal/tos/"}>Terms of Service</a>
+                </p>
+            }/>
+
+            <div style={{height: LIST_ELEMENT_PADDING}}/>
+            <LoadingButton variant={"contained"} loading={loading} onClick={doCreateAccount}>Create
+                account</LoadingButton>
         </div>
     )
 }

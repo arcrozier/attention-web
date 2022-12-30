@@ -30,7 +30,19 @@ export async function setCSRFToken(): Promise<AxiosResponse> {
     return axios.get(`${BASE_URL}set_csrf/`)
 }
 
-export async function login(username: string, password: string): Promise<any> {
+export async function login(username: string, password: string): Promise<AxiosResponse> {
     await requireCSRF()
     return axios.post(`${BASE_URL}login/`, {username: username, password: password})
+}
+
+export async function createAccount(username: string, email: string | null, firstName: string, lastName: string, password: string, tosAgree: boolean): Promise<AxiosResponse<APIResult<null>>> {
+    await requireCSRF()
+    return axios.post(`${BASE_URL}register_user/`, {
+        username: username,
+        email: email,
+        first_name: firstName,
+        last_name: lastName,
+        password: password,
+        tos_agree: tosAgree ? "yes" : "no"
+    })
 }
