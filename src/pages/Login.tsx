@@ -1,6 +1,6 @@
 import {useTitle, useProps} from "../Root";
 import {Logo} from "../utils/images";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Button, Divider, IconButton, InputAdornment, TextField, Typography} from "@mui/material";
 import {Google, Visibility, VisibilityOff} from "@mui/icons-material";
 import {Outlet} from "react-router-dom";
@@ -13,6 +13,22 @@ import {
 import {LoadingButton} from "@mui/lab";
 import {Link} from "react-router-dom";
 import {login} from "../utils/repository";
+
+const useGoogleSignIn = () => {
+    useEffect(() => {
+        const script = document.createElement('script');
+
+        script.src = "https://accounts.google.com/gsi/client";
+        script.async = true;
+        script.defer = true;
+
+        document.body.appendChild(script);
+
+        return () => {
+            document.body.removeChild(script);
+        }
+    }, []);
+}
 
 export function AuthRoot() {
     const props = useProps()
@@ -34,7 +50,7 @@ export function AuthRoot() {
 
 export function Login() {
 
-    const {webApp} = useProps()
+    const {webApp, darkMode} = useProps()
 
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
@@ -44,6 +60,8 @@ export function Login() {
         error: false,
         message: ''
     })
+
+    useGoogleSignIn()
 
     const handleClickShowPassword = () => {
         setPasswordShown(!passwordShown)
@@ -66,10 +84,24 @@ export function Login() {
         })
     }
 
+    const doGoogleSignIn = (result: any) => {
+        console.log(`Signing in with Google! ${result}`)
+    }
+
     useTitle(webApp, 'Login')
     // TODO
     return (
         <div>
+            <div id="g_id_onload"
+                 data-client_id="357995852275-tcfjuvtbrk3c57t5gsuc9a9jdfdn137s.apps.googleusercontent.com"
+                 data-context="signin"
+                 data-ux_mode="popup"
+                 data-callback="doGoogleSignIn"
+                 data-nonce=""
+                 data-auto_select="true"
+                 data-itp_support="true">
+            </div>
+
             <Typography variant={"h3"}>Login</Typography>
             <div style={{height: LIST_ELEMENT_PADDING}}/>
             <TextField variant={"outlined"} error={passwordStatus.error} label={"Username"}
@@ -109,6 +141,16 @@ export function Login() {
             }}>
                 Sign in with Google
             </Button>
+
+            <div className="g_id_signin"
+                 data-type="standard"
+                 data-shape="rectangular"
+                 data-theme={darkMode ? "filled_black" : "outline"}
+                 data-text="signin_with"
+                 data-size="large"
+                 data-locale="en"
+                 data-logo_alignment="left">
+            </div>
 
             <div style={{height: LIST_ELEMENT_PADDING}}/>
             <Button component={Link} to={'/create-account/'}>

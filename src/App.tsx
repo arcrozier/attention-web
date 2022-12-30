@@ -19,21 +19,21 @@ export enum MESSAGE_STATUS {
 }
 
 export interface Friend {
-    id: string,
+    friend: string,
     name: string,
     sent: number,
     received: number,
-    last_message_sent_id: string | null,
-    last_message_status: MESSAGE_STATUS | null,
+    last_message_id_sent: string | null,
+    last_message_status: string | null,
     photo: string
 }
 
 export interface UserInfo {
     username: string,
-    firstName: string,
-    lastName: string,
-    email: string,
-    password: boolean,
+    first_name: string,
+    last_name: string,
+    email: string | null,
+    password_login: boolean,
     photo: string,
     friends: Friend[]
 }
