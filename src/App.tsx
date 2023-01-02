@@ -1,6 +1,10 @@
 import React from 'react';
 import './App.css';
-import {Outlet, useLoaderData, useOutletContext} from "react-router-dom";
+import {
+    Outlet,
+    useLoaderData,
+    useOutletContext
+} from "react-router-dom";
 import {APIResult, getUserInfo} from "./utils/repository";
 import {Properties, useProps as useRootProps} from "./Root";
 import {AxiosResponse} from "axios";

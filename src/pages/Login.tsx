@@ -1,4 +1,4 @@
-import {useTitle, useProps} from "../Root";
+import {useTitle, useProps, useBack} from "../Root";
 import {Logo} from "../utils/images";
 import React, {useEffect, useState} from "react";
 import {
@@ -101,6 +101,7 @@ export function Login() {
     }
 
     window.doGoogleSignIn = (result: any) => {
+        // TODO
         console.log(`Signing in with Google! ${result}`)
     }
 
@@ -260,17 +261,15 @@ export function CreateAccount() {
 
     useTitle(webApp, 'Create Account')
 
+    const back = useBack()
+
     const error = darkMode ? theme.palette.error.dark : theme.palette.primary.dark
 
     return (
         <div>
             <Tooltip title={"Login"}>
                 <IconButton aria-label={"Login"} onClick={() => {
-                    if (window.history.state === null || !window.history.state.usr || !window.history.state.usr.goBack) {
-                        window.history.replaceState({goBack: false}, "", '/login')
-                        window.history.pushState({goBack: true}, "", '')
-                    }
-                    navigate(-1)
+                    back('/login')
                 }} style={{
                     position: "fixed",
                     top: "10pt",
@@ -356,7 +355,7 @@ export function CreateAccount() {
                                           <p style={{color: tosAgreeError ? error : "inherit"}}>
                                               I have read and agree to the <a
                                               href={"https://aracroproducts.com/legal/tos/"}
-                                              target={"_blank"} rel={"noreferrer"}>Terms of
+                                              target={"_blank"} rel={"noreferrer"} className={"default"}>Terms of
                                               Service</a>
                                           </p>
                                       }/>

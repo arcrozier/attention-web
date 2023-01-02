@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from "react";
-import {useOutletContext, Outlet} from "react-router-dom";
+import {Outlet, useNavigate, useOutletContext} from "react-router-dom";
 import Cookies from "js-cookie";
 import {
     createTheme,
     IconButton,
     responsiveFontSizes,
-    ThemeProvider, Typography,
+    ThemeProvider,
+    Typography,
     useMediaQuery
 } from "@mui/material";
 import {Close} from "@mui/icons-material";
@@ -18,6 +19,17 @@ export interface Properties {
 
 export function useProps() {
     return useOutletContext<Properties>()
+}
+
+export function useBack() {
+    const navigate = useNavigate()
+    return (url: string) => {
+        if (window.history.state === null || !window.history.state.usr || !window.history.state.usr.goBack) {
+            window.history.replaceState({goBack: false}, "", url)
+            window.history.pushState({goBack: true}, "", '')
+        }
+        navigate(-1)
+    }
 }
 
 function supportsApp(): boolean {
