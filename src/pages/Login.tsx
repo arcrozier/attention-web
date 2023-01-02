@@ -123,7 +123,7 @@ export function Login() {
                 <TextField variant={"outlined"} error={passwordStatus.error} label={"Username"}
                            value={username} onChange={(e) => {
                     setUsername(usernameChanged(e))
-                }} />
+                }}/>
                 <div style={{height: LIST_ELEMENT_PADDING}}/>
                 <TextField variant={"outlined"} label={"Password"} error={passwordStatus.error}
                            value={password} onChange={(e) => {
@@ -238,13 +238,17 @@ export function CreateAccount() {
 
             createAccount(username, email, firstName, lastName, password, tosAgree).then(() => {
                 login(username, password).then(() => {
-                    navigate('/', {replace: true})
+                        navigate('/', {replace: true})
                     }
                 )
-                }).catch((error) => {
+            }).catch((error) => {
                 if (error.response && error.response.status === 400) {
-                    console.log(error)
-                    setPasswordStatus({error: true, message: 'Invalid username or password'})
+                    if (error.response.data.message.includes('email')) {
+                        setEmailStatus({error: true, message: 'Email already in use'})
+                    }
+                    if (error.response.data.message.includes('username')) {
+                        setUsernameStatus({error: true, message: 'Username already in use'})
+                    }
                 } else {
                     throw(error)
                 }
@@ -260,7 +264,7 @@ export function CreateAccount() {
 
     return (
         <div>
-            <Tooltip title={"Login"} >
+            <Tooltip title={"Login"}>
                 <IconButton aria-label={"Login"} onClick={() => {
                     if (window.history.state === null || !window.history.state.usr || !window.history.state.usr.goBack) {
                         window.history.replaceState({goBack: false}, "", '/login')
@@ -271,7 +275,7 @@ export function CreateAccount() {
                     position: "fixed",
                     top: "10pt",
                     left: "10pt"
-                }} size={"large"}><ArrowBack /></IconButton>
+                }} size={"large"}><ArrowBack/></IconButton>
             </Tooltip>
 
             <Typography variant={"h3"}>Create Account</Typography>
@@ -284,7 +288,8 @@ export function CreateAccount() {
                 }} required={true} helperText={usernameStatus.message}/>
 
                 <div style={{height: LIST_ELEMENT_PADDING}}/>
-                <TextField variant={"outlined"} error={emailStatus.error} label={"Email"} value={email}
+                <TextField variant={"outlined"} error={emailStatus.error} label={"Email"}
+                           value={email}
                            onChange={(e) => {
                                setEmail(stripNewlines(e))
                                setEmailStatus({error: false, message: ''})
@@ -297,9 +302,10 @@ export function CreateAccount() {
                            }} required={false}/>
 
                 <div style={{height: LIST_ELEMENT_PADDING}}/>
-                <TextField variant={"outlined"} label={"Last name"} value={lastName} onChange={(e) => {
-                    setLastName(stripNewlines(e))
-                }} required={false}/>
+                <TextField variant={"outlined"} label={"Last name"} value={lastName}
+                           onChange={(e) => {
+                               setLastName(stripNewlines(e))
+                           }} required={false}/>
 
                 <div style={{height: LIST_ELEMENT_PADDING}}/>
                 <TextField variant={"outlined"} label={"Password"} error={passwordStatus.error}
@@ -322,7 +328,8 @@ export function CreateAccount() {
                 <TextField variant={"outlined"} label={"Confirm password"}
                            error={confirmPasswordStatus.error}
                            required={true}
-                           helperText={confirmPasswordStatus.message} value={confirmPassword} type={passwordShown ? "text" : "password"}
+                           helperText={confirmPasswordStatus.message} value={confirmPassword}
+                           type={passwordShown ? "text" : "password"}
                            onChange={(e) => {
                                setConfirmPassword(stripNewlines(e))
                                setConfirmPasswordStatus({error: false, message: ''})
@@ -344,10 +351,13 @@ export function CreateAccount() {
                     }} control={<Checkbox checked={tosAgree} onChange={() => {
                         setTosAgree(!tosAgree)
                         setTosAgreeError(false)
-                    }} required={true} />}
+                    }} required={true}/>}
                                       label={
                                           <p style={{color: tosAgreeError ? error : "inherit"}}>
-                                              I have read and agree to the <a href={"https://aracroproducts.com/legal/tos/"} target={"_blank"} rel={"noreferrer"}>Terms of Service</a>
+                                              I have read and agree to the <a
+                                              href={"https://aracroproducts.com/legal/tos/"}
+                                              target={"_blank"} rel={"noreferrer"}>Terms of
+                                              Service</a>
                                           </p>
                                       }/>
                 </div>
