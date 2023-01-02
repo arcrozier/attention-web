@@ -108,7 +108,7 @@ export default function Root() {
     return (
         <ThemeProvider theme={theme}>
             <div style={{
-                height: "100%",
+                minHeight: "100vh",
                 display: "flex",
                 flexDirection: "column",
                 backgroundColor: theme.palette.background.default,

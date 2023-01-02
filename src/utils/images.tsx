@@ -1,19 +1,23 @@
+import {CSSProperties} from "react";
+
 export interface ImageProps {
     fill?: string,
     alt?: string,
     height?: string,
     width?: string,
     className?: string,
+    style?: CSSProperties
 }
 
 export const Logo = ({
                          alt = "Logo",
                          height = "48px",
                          width = "48px",
-                         className = ""
+                         className = "",
+    style = {}
                      }: ImageProps) => {
     return (
-        <div style={{height: height, width: width}} className={className}>
+        <div style={{height: height, width: width, ...style}} className={className}>
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 id="icon"

@@ -23,6 +23,7 @@
 
 .center-horizontal {
   text-align: center;
+  justify-content: center;
 }
 
 .center {
@@ -33,7 +34,7 @@
 }
 
 html, body, #root {
-  height: 100%;
+  min-height: 100vh;
 }
 
 .btn {
@@ -45,4 +46,27 @@ html, body, #root {
 .textfield-width {
   width: 200pt;
   max-width: 95%;
+  margin: auto;
+}
+
+.textfield-width > * {
+  width: 100%;
+}
+
+a {
+  color: darkblue;
+}
+
+a:visited {
+  color: blueviolet;
+}
+
+@media (prefers-color-scheme: dark) {
+  a {
+    color: deepskyblue;
+  }
+
+  a:visited {
+    color: skyblue;
+  }
 }
