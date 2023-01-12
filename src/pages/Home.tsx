@@ -2,6 +2,7 @@ import React from "react";
 import {Friend, useProps} from "../App";
 import {useTitle} from "../Root";
 import {AttentionAppBar} from "../utils/AttentionAppBar";
+import {Typography} from "@mui/material";
 
 const DEFAULT_PFP_SIZE = "40pt"
 
@@ -24,7 +25,7 @@ function FriendCard(props: FriendCardProps) {
     const friend = props.friend
 
     return (
-        <div style={{width: "100%", height: "72pt", display: "flex", flexDirection: "row", alignItems: "center"}}>
+        <div style={{width: "100%", height: "48pt", display: "flex", flexDirection: "row", alignItems: "center"}}>
             <div style={{width: DEFAULT_PFP_SIZE, height: DEFAULT_PFP_SIZE, margin: "0 8pt 0 8pt"}}>
                 {friend.photo != null &&
                     <img style={{height: DEFAULT_PFP_SIZE, width: DEFAULT_PFP_SIZE,
@@ -34,7 +35,9 @@ function FriendCard(props: FriendCardProps) {
                          alt={`Profile photo for ${friend.name}`}/>}
             </div>
             <div style={{flexGrow: 1}}>
-                {friend.name}
+                <Typography variant={"h6"} >
+                    {friend.name}
+                </Typography>
             </div>
         </div>
     )
@@ -59,7 +62,7 @@ export function Home() {
     return (
         <div className="App">
             <AttentionAppBar title={"Attention!"} back={null} settings={true} />
-            <ul style={{padding: "0px"}}>
+            <ul style={{padding: 0, margin: 0}}>
                 {friends}
             </ul>
         </div>
