@@ -29,7 +29,7 @@ export interface Friend {
     received: number,
     last_message_id_sent: string | null,
     last_message_status: string | null,
-    photo: string
+    photo: string | null
 }
 
 export interface UserInfo {

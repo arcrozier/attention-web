@@ -1,7 +1,8 @@
 import {useBack, useTitle} from "../Root";
 import {useProps} from "../App";
-import {AppBar, IconButton, Toolbar, Tooltip, Typography} from "@mui/material";
+import {IconButton, Tooltip} from "@mui/material";
 import {ArrowBack} from "@mui/icons-material";
+import {AttentionAppBar} from "../utils/AttentionAppBar";
 
 
 export function Settings() {
@@ -15,27 +16,20 @@ export function Settings() {
     return (
         <div>
 
-            <AppBar position="static">
-                <Toolbar>
-                    <Tooltip title={'Home'}>
-                        <IconButton
-                            size="large"
-                            edge="start"
-                            color="inherit"
-                            aria-label="home"
-                            sx={{ mr: 2 }}
-                            onClick={() => {
-                                back('/')
-                            }}
-                        >
-                            <ArrowBack />
-                        </IconButton>
-                    </Tooltip>
-                    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                        Settings
-                    </Typography>
-                </Toolbar>
-            </AppBar>
+            <AttentionAppBar title={"Settings"} back={<Tooltip title={'Home'}>
+                <IconButton
+                    size="large"
+                    edge="start"
+                    color="inherit"
+                    aria-label="home"
+                    sx={{ mr: 2 }}
+                    onClick={() => {
+                        back('/')
+                    }}
+                >
+                    <ArrowBack />
+                </IconButton>
+            </Tooltip>} settings={false} />
             <p>Settings!</p>
         </div>
         )

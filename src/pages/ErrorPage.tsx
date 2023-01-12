@@ -51,7 +51,7 @@ export default function ErrorPage() {
         <div id="error-page" style={{
             backgroundColor: theme.palette.background.default,
             color: theme.palette.getContrastText(theme.palette.background.default),
-            height: "100%",
+            height: "100vh",
             width: "100%",
             display: "inline-block",
             boxSizing: "border-box"
