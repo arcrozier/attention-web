@@ -2,7 +2,9 @@ import React, {useLayoutEffect, useRef, useState} from "react";
 import {Friend, useProps} from "../App";
 import {useTitle} from "../Root";
 import {AttentionAppBar} from "../utils/AttentionAppBar";
-import {Typography} from "@mui/material";
+import {Button, IconButton, Typography} from "@mui/material";
+import {FloatingDiv} from "../utils/FloatingDiv";
+import {Close} from "@mui/icons-material";
 
 const DEFAULT_PFP_SIZE = "40pt"
 
@@ -29,6 +31,8 @@ function FriendCard(props: FriendCardProps) {
     const outerRef = useRef<HTMLDivElement>(null)
     const innerRef = useRef<HTMLDivElement>(null)
 
+    const [message, setMessage] = useState<string | null>(null)
+
     const [width, setWidth] = useState(0)
     const [innerWidth, setInnerWidth] = useState(0)
     useLayoutEffect(() => {
@@ -38,32 +42,39 @@ function FriendCard(props: FriendCardProps) {
 
     console.log(`${displayX}, ${width}, ${innerWidth}`)
 
-    let contents: React.ReactElement | null
+    let overlay: React.ReactElement | null
     switch (props.state) {
         case FriendCardState.NORMAL:
-            contents = null
+            overlay = null
             break
         case FriendCardState.SEND:
-            contents = null
+            overlay = <FloatingDiv parentWidth={width} positionX={displayX}>
+                <IconButton aria-label={"close"} onClick={(e) => {
+                    e.preventDefault()
+                    props.setState(FriendCardState.NORMAL)
+                }
+                }>
+                    <Close />
+                </IconButton>
+                <Button onClick={(e) => {
+                    e.preventDefault()
+                    props.setState(FriendCardState.CANCEL)
+                }
+                }>
+                    Send notification
+                </Button>
+                <Button onClick={(e) => {
+                e.preventDefault()
+                // TODO open dialog
+                }
+                } variant={"outlined"}>
+                    Edit message
+                </Button>
+            </FloatingDiv>
             break
         default:
-            contents = null
+            overlay = null
     }
-    const overlay = contents == null ? null : (
-
-        <div style={{
-            position: "absolute",
-            height: "100%",
-            width: "40px",
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            left: `${Math.max(0, Math.min(width - innerWidth, displayX - innerWidth / 2))}px`,
-            backgroundColor: "red"
-        }} ref={innerRef}>
-            {contents}
-        </div>
-    )
 
     return (
         <div style={{

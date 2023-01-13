@@ -46,3 +46,12 @@ export async function createAccount(username: string, email: string | null, firs
         tos_agree: tosAgree ? "yes" : "no"
     })
 }
+
+export async function sendMessage(to: string, message: string | null = null) {
+    await requireCSRF()
+    return axios.post(`${BASE_URL}send_alert/`, {
+        to: to,
+        message: message
+    })
+
+}
