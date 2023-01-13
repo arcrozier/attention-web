@@ -121,7 +121,7 @@ export function Login() {
             <Typography variant={"h3"}>Login</Typography>
             <div style={{height: LIST_ELEMENT_PADDING}}/>
             <div className={"textfield-width"}>
-                <TextField variant={"outlined"} error={passwordStatus.error} label={"Username"}
+                <TextField autoComplete={"username"} variant={"outlined"} error={passwordStatus.error} label={"Username"}
                            value={username} onChange={(e) => {
                                if (e.nativeEvent instanceof KeyboardEvent && e.nativeEvent.key === 'Enter') {
                                    doLogin()
@@ -130,7 +130,7 @@ export function Login() {
                                }
                 }}/>
                 <div style={{height: LIST_ELEMENT_PADDING}}/>
-                <TextField variant={"outlined"} label={"Password"} error={passwordStatus.error}
+                <TextField autoComplete={"current-password"} variant={"outlined"} label={"Password"} error={passwordStatus.error}
                            value={password} onChange={(e) => {
                     setPassword(stripNewlines(e))
                 }} helperText={passwordStatus.message}
@@ -280,14 +280,14 @@ export function CreateAccount() {
             <Typography variant={"h3"}>Create Account</Typography>
             <div style={{height: LIST_ELEMENT_PADDING}}/>
             <div className={"textfield-width"}>
-                <TextField variant={"outlined"} error={usernameStatus.error} label={"Username"}
+                <TextField autoComplete={"username"} variant={"outlined"} error={usernameStatus.error} label={"Username"}
                            value={username} onChange={(e) => {
                     setUsername(usernameChanged(e))
                     setUsernameStatus({error: false, message: ''})
                 }} required={true} helperText={usernameStatus.message}/>
 
                 <div style={{height: LIST_ELEMENT_PADDING}}/>
-                <TextField variant={"outlined"} error={emailStatus.error} label={"Email"}
+                <TextField autoComplete={"email"} type={"email"} variant={"outlined"} error={emailStatus.error} label={"Email"}
                            value={email}
                            onChange={(e) => {
                                setEmail(stripNewlines(e))
@@ -295,19 +295,19 @@ export function CreateAccount() {
                            }} required={false} helperText={emailStatus.message}/>
 
                 <div style={{height: LIST_ELEMENT_PADDING}}/>
-                <TextField variant={"outlined"} label={"First name"} value={firstName}
+                <TextField autoComplete={"given-name"} variant={"outlined"} label={"First name"} value={firstName}
                            onChange={(e) => {
                                setFirstName(stripNewlines(e))
                            }} required={false}/>
 
                 <div style={{height: LIST_ELEMENT_PADDING}}/>
-                <TextField variant={"outlined"} label={"Last name"} value={lastName}
+                <TextField autoComplete={"family-name"} variant={"outlined"} label={"Last name"} value={lastName}
                            onChange={(e) => {
                                setLastName(stripNewlines(e))
                            }} required={false}/>
 
                 <div style={{height: LIST_ELEMENT_PADDING}}/>
-                <TextField variant={"outlined"} label={"Password"} error={passwordStatus.error}
+                <TextField autoComplete={"new-password"} variant={"outlined"} label={"Password"} error={passwordStatus.error}
                            value={password} onChange={(e) => {
                     setPassword(stripNewlines(e))
                     setPasswordStatus({error: false, message: ''})
@@ -324,7 +324,8 @@ export function CreateAccount() {
                            }} helperText={passwordStatus.message}/>
 
                 <div style={{height: LIST_ELEMENT_PADDING}}/>
-                <TextField variant={"outlined"} label={"Confirm password"}
+                <TextField autoComplete={"new-password"} variant={"outlined"} label={"Confirm" +
+                    " password"}
                            error={confirmPasswordStatus.error}
                            required={true}
                            helperText={confirmPasswordStatus.message} value={confirmPassword}
