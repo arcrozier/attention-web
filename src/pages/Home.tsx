@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useLayoutEffect, useRef, useState} from "react";
 import {Friend, useProps} from "../App";
 import {useTitle} from "../Root";
 import {AttentionAppBar} from "../utils/AttentionAppBar";
@@ -17,12 +17,53 @@ enum FriendCardState {
 interface FriendCardProps {
     friend: Friend,
     state: FriendCardState,
-    setState: (state: FriendCardState, card: string) => void,
+    setState: (state: FriendCardState) => void,
 }
 
 
 function FriendCard(props: FriendCardProps) {
     const friend = props.friend
+
+    const [displayX, setDisplayX] = useState(0)
+
+    const outerRef = useRef<HTMLDivElement>(null)
+    const innerRef = useRef<HTMLDivElement>(null)
+
+    const [width, setWidth] = useState(0)
+    const [innerWidth, setInnerWidth] = useState(0)
+    useLayoutEffect(() => {
+        if (outerRef.current != null) setWidth(outerRef.current.clientWidth)
+        if (innerRef.current != null) setInnerWidth(innerRef.current.clientWidth)
+    })
+
+    console.log(`${displayX}, ${width}, ${innerWidth}`)
+
+    let contents: React.ReactElement | null
+    switch (props.state) {
+        case FriendCardState.NORMAL:
+            contents = null
+            break
+        case FriendCardState.SEND:
+            contents = null
+            break
+        default:
+            contents = null
+    }
+    const overlay = contents == null ? null : (
+
+        <div style={{
+            position: "absolute",
+            height: "100%",
+            width: "40px",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            left: `${Math.max(0, Math.min(width - innerWidth, displayX - innerWidth / 2))}px`,
+            backgroundColor: "red"
+        }} ref={innerRef}>
+            {contents}
+        </div>
+    )
 
     return (
         <div style={{
@@ -30,8 +71,34 @@ function FriendCard(props: FriendCardProps) {
             height: "48pt",
             display: "flex",
             flexDirection: "row",
-            alignItems: "center"
-        }}>
+            alignItems: "center",
+            cursor: "pointer"
+        }} ref={outerRef} onClick={(e) => {
+            e.preventDefault()
+            console.log(e.nativeEvent)
+            setDisplayX(e.clientX - e.currentTarget.getBoundingClientRect().left)
+            switch (props.state) {
+                case FriendCardState.NORMAL:
+                    props.setState(FriendCardState.SEND)
+                    break
+                case FriendCardState.CANCEL:
+                case FriendCardState.SEND:
+                case FriendCardState.EDIT:
+                    props.setState(FriendCardState.NORMAL)
+                    break
+            }
+        }
+        } onContextMenu={(e) => {
+            e.preventDefault()
+            setDisplayX(e.nativeEvent.offsetX)
+            switch (props.state) {
+                case FriendCardState.NORMAL:
+                case FriendCardState.SEND:
+                    props.setState(FriendCardState.EDIT)
+                    break
+            }
+        }
+        }>
             <div style={{width: DEFAULT_PFP_SIZE, height: DEFAULT_PFP_SIZE, margin: "0 8pt 0 8pt"}}>
                 {friend.photo != null &&
                 <img style={{
@@ -40,13 +107,14 @@ function FriendCard(props: FriendCardProps) {
                     borderRadius: "50%"
                 }}
                      src={`data:image/png;base64,${friend.photo}`}
-                     alt={`Profile photo for ${friend.name}`}/>}
+                     alt={`Profile for ${friend.name}`}/>}
             </div>
             <div style={{flexGrow: 1}}>
                 <Typography variant={"h6"}>
                     {friend.name}
                 </Typography>
             </div>
+            {overlay !== null && overlay}
         </div>
     )
 }

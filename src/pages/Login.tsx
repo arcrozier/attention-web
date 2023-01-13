@@ -123,7 +123,11 @@ export function Login() {
             <div className={"textfield-width"}>
                 <TextField variant={"outlined"} error={passwordStatus.error} label={"Username"}
                            value={username} onChange={(e) => {
-                    setUsername(usernameChanged(e))
+                               if (e.nativeEvent instanceof KeyboardEvent && e.nativeEvent.key === 'Enter') {
+                                   doLogin()
+                               } else {
+                                   setUsername(usernameChanged(e))
+                               }
                 }}/>
                 <div style={{height: LIST_ELEMENT_PADDING}}/>
                 <TextField variant={"outlined"} label={"Password"} error={passwordStatus.error}
@@ -139,11 +143,7 @@ export function Login() {
                                        {passwordShown ? <Visibility/> : <VisibilityOff/>}
                                    </IconButton>
                                </InputAdornment>
-                           }} onKeyPress={(event) => {
-                    if (event.key === 'Enter') {
-                        doLogin()
-                    }
-                }}/>
+                           }} />
             </div>
 
 
@@ -330,17 +330,17 @@ export function CreateAccount() {
                            helperText={confirmPasswordStatus.message} value={confirmPassword}
                            type={passwordShown ? "text" : "password"}
                            onChange={(e) => {
-                               setConfirmPassword(stripNewlines(e))
-                               setConfirmPasswordStatus({error: false, message: ''})
+                               if (e.nativeEvent instanceof KeyboardEvent && e.nativeEvent.key === 'Enter') {
+                                   doCreateAccount()
+                               } else {
+                                   setConfirmPassword(stripNewlines(e))
+                                   setConfirmPasswordStatus({error: false, message: ''})
+                               }
                            }} InputProps={{
                     endAdornment: <InputAdornment position="end">
                         {confirmPassword.length === 0 ? null : (confirmPassword === password ?
                             <Check color={"success"}/> : <Close color={"error"}/>)}
                     </InputAdornment>
-                }} onKeyPress={(event) => {
-                    if (event.key === 'Enter') {
-                        doCreateAccount()
-                    }
                 }}/>
 
                 <div style={{height: LIST_ELEMENT_PADDING}}/>
