@@ -75,6 +75,7 @@ function FriendCard(props: FriendCardProps) {
                 </Button>
                 <Button style={style} onClick={(e) => {
                     e.preventDefault()
+                    props.setState(FriendCardState.NORMAL)
                     setAddMessage(true)
                 }
                 } variant={"outlined"}>
@@ -140,12 +141,8 @@ function FriendCard(props: FriendCardProps) {
             <Dialog
                 onClose={() => setAddMessage(false)}
             open={addMessage}>
-                <DialogTitle>Subscribe</DialogTitle>
+                <DialogTitle>Send custom message to {friend.name}</DialogTitle>
                 <DialogContent>
-                    <DialogContentText>
-                        To subscribe to this website, please enter your email address here. We
-                        will send updates occasionally.
-                    </DialogContentText>
                     <TextField
                         autoFocus
                         margin="dense"
@@ -163,11 +160,11 @@ function FriendCard(props: FriendCardProps) {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setAddMessage(false)}>Cancel</Button>
-                    <Button onClick={() => {
+                    <Button variant={"contained"} onClick={() => {
                         props.setState(FriendCardState.CANCEL)
                         setAddMessage(false)
                     }
-                    }>Subscribe</Button>
+                    }>Send</Button>
                 </DialogActions>
             </Dialog>
         </div>
