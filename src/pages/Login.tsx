@@ -121,16 +121,24 @@ export function Login() {
             <Typography variant={"h3"}>Login</Typography>
             <div style={{height: LIST_ELEMENT_PADDING}}/>
             <div className={"textfield-width"}>
-                <TextField autoComplete={"username"} variant={"outlined"} error={passwordStatus.error} label={"Username"}
-                           value={username} onChange={(e) => {
-                               if (e.nativeEvent instanceof KeyboardEvent && e.nativeEvent.key === 'Enter') {
+                <TextField autoComplete={"username"} variant={"outlined"}
+                           error={passwordStatus.error} label={"Username"}
+                           onKeyPress={(event) => {
+                               if (event.key === 'Enter') {
                                    doLogin()
-                               } else {
-                                   setUsername(usernameChanged(e))
                                }
+                           }}
+                           value={username} onChange={(e) => {
+                    setUsername(usernameChanged(e))
                 }}/>
                 <div style={{height: LIST_ELEMENT_PADDING}}/>
-                <TextField autoComplete={"current-password"} variant={"outlined"} label={"Password"} error={passwordStatus.error}
+                <TextField autoComplete={"current-password"} variant={"outlined"} label={"Password"}
+                           error={passwordStatus.error}
+                           onKeyPress={(event) => {
+                               if (event.key === 'Enter') {
+                                   doLogin()
+                               }
+                           }}
                            value={password} onChange={(e) => {
                     setPassword(stripNewlines(e))
                 }} helperText={passwordStatus.message}
@@ -143,7 +151,7 @@ export function Login() {
                                        {passwordShown ? <Visibility/> : <VisibilityOff/>}
                                    </IconButton>
                                </InputAdornment>
-                           }} />
+                           }}/>
             </div>
 
 
@@ -280,14 +288,26 @@ export function CreateAccount() {
             <Typography variant={"h3"}>Create Account</Typography>
             <div style={{height: LIST_ELEMENT_PADDING}}/>
             <div className={"textfield-width"}>
-                <TextField autoComplete={"username"} variant={"outlined"} error={usernameStatus.error} label={"Username"}
+                <TextField autoComplete={"username"} variant={"outlined"}
+                           error={usernameStatus.error} label={"Username"}
+                           onKeyPress={(event) => {
+                               if (event.key === 'Enter') {
+                                   doCreateAccount()
+                               }
+                           }}
                            value={username} onChange={(e) => {
                     setUsername(usernameChanged(e))
                     setUsernameStatus({error: false, message: ''})
                 }} required={true} helperText={usernameStatus.message}/>
 
                 <div style={{height: LIST_ELEMENT_PADDING}}/>
-                <TextField autoComplete={"email"} type={"email"} variant={"outlined"} error={emailStatus.error} label={"Email"}
+                <TextField autoComplete={"email"} type={"email"} variant={"outlined"}
+                           error={emailStatus.error} label={"Email"}
+                           onKeyPress={(event) => {
+                               if (event.key === 'Enter') {
+                                   doCreateAccount()
+                               }
+                           }}
                            value={email}
                            onChange={(e) => {
                                setEmail(stripNewlines(e))
@@ -295,19 +315,37 @@ export function CreateAccount() {
                            }} required={false} helperText={emailStatus.message}/>
 
                 <div style={{height: LIST_ELEMENT_PADDING}}/>
-                <TextField autoComplete={"given-name"} variant={"outlined"} label={"First name"} value={firstName}
+                <TextField autoComplete={"given-name"} variant={"outlined"} label={"First name"}
+                           value={firstName}
+                           onKeyPress={(event) => {
+                               if (event.key === 'Enter') {
+                                   doCreateAccount()
+                               }
+                           }}
                            onChange={(e) => {
                                setFirstName(stripNewlines(e))
                            }} required={false}/>
 
                 <div style={{height: LIST_ELEMENT_PADDING}}/>
-                <TextField autoComplete={"family-name"} variant={"outlined"} label={"Last name"} value={lastName}
+                <TextField autoComplete={"family-name"} variant={"outlined"} label={"Last name"}
+                           value={lastName}
+                           onKeyPress={(event) => {
+                               if (event.key === 'Enter') {
+                                   doCreateAccount()
+                               }
+                           }}
                            onChange={(e) => {
                                setLastName(stripNewlines(e))
                            }} required={false}/>
 
                 <div style={{height: LIST_ELEMENT_PADDING}}/>
-                <TextField autoComplete={"new-password"} variant={"outlined"} label={"Password"} error={passwordStatus.error}
+                <TextField autoComplete={"new-password"} variant={"outlined"} label={"Password"}
+                           error={passwordStatus.error}
+                           onKeyPress={(event) => {
+                               if (event.key === 'Enter') {
+                                   doCreateAccount()
+                               }
+                           }}
                            value={password} onChange={(e) => {
                     setPassword(stripNewlines(e))
                     setPasswordStatus({error: false, message: ''})
@@ -325,9 +363,14 @@ export function CreateAccount() {
 
                 <div style={{height: LIST_ELEMENT_PADDING}}/>
                 <TextField autoComplete={"new-password"} variant={"outlined"} label={"Confirm" +
-                    " password"}
+                " password"}
                            error={confirmPasswordStatus.error}
                            required={true}
+                           onKeyPress={(event) => {
+                               if (event.key === 'Enter') {
+                                   doCreateAccount()
+                               }
+                           }}
                            helperText={confirmPasswordStatus.message} value={confirmPassword}
                            type={passwordShown ? "text" : "password"}
                            onChange={(e) => {
@@ -356,7 +399,8 @@ export function CreateAccount() {
                                           <p style={{color: tosAgreeError ? error : "inherit"}}>
                                               I have read and agree to the <a
                                               href={"https://aracroproducts.com/legal/tos/"}
-                                              target={"_blank"} rel={"noreferrer"} className={"default"}>Terms of
+                                              target={"_blank"} rel={"noreferrer"}
+                                              className={"default"}>Terms of
                                               Service</a>
                                           </p>
                                       }/>

@@ -6,7 +6,6 @@ import {
     Button,
     Dialog, DialogActions,
     DialogContent,
-    DialogContentText,
     DialogTitle,
     IconButton, TextField,
     Typography
@@ -83,6 +82,33 @@ function FriendCard(props: FriendCardProps) {
                 </Button>
             </FloatingDiv>
             break
+        case FriendCardState.EDIT:
+            overlay = <FloatingDiv parentWidth={width} positionX={displayX}>
+                <IconButton style={style} aria-label={"close"} onClick={(e) => {
+                    e.preventDefault()
+                    props.setState(FriendCardState.NORMAL)
+                }
+                }>
+                    <Close/>
+                </IconButton>
+                <Button style={style} variant={"contained"} onClick={(e) => {
+                    e.preventDefault()
+                    props.setState(FriendCardState.NORMAL)
+                    // TODO
+                }
+                }>
+                    Edit
+                </Button>
+                <Button style={style} color={"error"} onClick={(e) => {
+                    e.preventDefault()
+                    props.setState(FriendCardState.NORMAL)
+                    // TODO
+                }
+                } variant={"outlined"}>
+                    Delete
+                </Button>
+            </FloatingDiv>
+            break
         default:
             overlay = null
     }
@@ -124,13 +150,13 @@ function FriendCard(props: FriendCardProps) {
         }>
             <div style={{width: DEFAULT_PFP_SIZE, height: DEFAULT_PFP_SIZE, margin: "0 8pt 0 8pt"}}>
                 {friend.photo != null &&
-                    <img style={{
-                        height: DEFAULT_PFP_SIZE, width: DEFAULT_PFP_SIZE,
-                        objectFit: "cover",
-                        borderRadius: "50%"
-                    }}
-                         src={`data:image/png;base64,${friend.photo}`}
-                         alt={`Profile for ${friend.name}`}/>}
+                <img style={{
+                    height: DEFAULT_PFP_SIZE, width: DEFAULT_PFP_SIZE,
+                    objectFit: "cover",
+                    borderRadius: "50%"
+                }}
+                     src={`data:image/png;base64,${friend.photo}`}
+                     alt={`Profile for ${friend.name}`}/>}
             </div>
             <div style={{flexGrow: 1}}>
                 <Typography variant={"h6"}>
@@ -140,7 +166,7 @@ function FriendCard(props: FriendCardProps) {
             {overlay !== null && overlay}
             <Dialog
                 onClose={() => setAddMessage(false)}
-            open={addMessage}>
+                open={addMessage}>
                 <DialogTitle>Send custom message to {friend.name}</DialogTitle>
                 <DialogContent>
                     <TextField
