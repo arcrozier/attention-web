@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {Friend, useProps} from "../App";
 import {useTitle} from "../Root";
 import {AttentionAppBar} from "../utils/AttentionAppBar";
@@ -12,7 +12,8 @@ import {
 } from "@mui/material";
 import {FloatingDiv} from "../utils/FloatingDiv";
 import {Close} from "@mui/icons-material";
-import {LIST_ELEMENT_PADDING} from "../utils/defs";
+import {DEFAULT_DELAY, LIST_ELEMENT_PADDING, UPDATE_INTERVAL} from "../utils/defs";
+import Cookies from "js-cookie";
 
 const DEFAULT_PFP_SIZE = "40pt"
 
@@ -26,6 +27,7 @@ enum FriendCardState {
 
 interface FriendCardProps {
     friend: Friend,
+    delay: number,
     state: FriendCardState,
     setState: (state: FriendCardState) => void,
 }
@@ -48,14 +50,38 @@ function FriendCard(props: FriendCardProps) {
     }, []);
 
     const [addMessage, setAddMessage] = useState(false)
+    const [name, setName] = useState(friend.name)
+    const [nameDialog, setNameDialog] = useState(false)
+
+    const [deleteDialog, setDeleteDialog] = useState(false)
+
+    const [cancelProgress, setCancelProgress] = useState(0)
 
     const [message, setMessage] = useState<string | null>(null)
     let overlay: React.ReactElement | null
 
+    useEffect(() => {
+        if (props.state === FriendCardState.CANCEL) {
+            const interval = setInterval(() => {
+                setCancelProgress((prevState) => {
+                    if (prevState + UPDATE_INTERVAL <= props.delay * 1000) {
+                        return prevState + UPDATE_INTERVAL
+                    }
+                    return props.delay * 1000
+                })
+                if (cancelProgress >= props.delay * 1000) {
+                    props.setState(FriendCardState.NORMAL)
+                    // TODO send request
+                }
+            }, UPDATE_INTERVAL)
+            return () => {
+                clearInterval(interval)
+                setCancelProgress(0)
+            }
+        }
+    }, [props.delay, props.state])
+
     switch (props.state) {
-        case FriendCardState.NORMAL:
-            overlay = null
-            break
         case FriendCardState.SEND:
             overlay = <FloatingDiv parentWidth={width} positionX={displayX}>
                 <IconButton style={style} aria-label={"close"} onClick={(e) => {
@@ -94,7 +120,7 @@ function FriendCard(props: FriendCardProps) {
                 <Button style={style} variant={"contained"} onClick={(e) => {
                     e.preventDefault()
                     props.setState(FriendCardState.NORMAL)
-                    // TODO
+                    setNameDialog(true)
                 }
                 }>
                     Edit
@@ -102,12 +128,18 @@ function FriendCard(props: FriendCardProps) {
                 <Button style={style} color={"error"} onClick={(e) => {
                     e.preventDefault()
                     props.setState(FriendCardState.NORMAL)
-                    // TODO
+                    setDeleteDialog(true)
                 }
                 } variant={"outlined"}>
                     Delete
                 </Button>
             </FloatingDiv>
+            break
+        case FriendCardState.CANCEL:
+            // TODO replace with correct colors
+            overlay = <div style={{width: "100%", height: "100%", position: "absolute", backgroundColor: "#000", ...style}}>
+                <div style={{width: `${cancelProgress / (1000 * props.delay)}%`, height: "100%", borderRadius: "1rem", transition: `${UPDATE_INTERVAL / 1000}s linear`, backgroundColor: "#fff"}}/>
+            </div>
             break
         default:
             overlay = null
@@ -193,6 +225,35 @@ function FriendCard(props: FriendCardProps) {
                     }>Send</Button>
                 </DialogActions>
             </Dialog>
+            <Dialog
+                onClose={() => setAddMessage(false)}
+                open={nameDialog}>
+                <DialogTitle>Change name for {friend.friend}</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="message"
+                        label={`Name`}
+                        type="text"
+                        value={name}
+                        onChange={(e) => {
+                            setName(e.target.value)
+                        }
+                        }
+                        fullWidth
+                        variant="standard"
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setAddMessage(false)}>Cancel</Button>
+                    <Button variant={"contained"} onClick={() => {
+                        // TODO send request
+                        setAddMessage(false)
+                    }
+                    }>Okay</Button>
+                </DialogActions>
+            </Dialog>
         </div>
     )
 }
@@ -204,6 +265,9 @@ export function Home() {
 
     console.log(userInfo)
 
+    const tempDelay = +(window.localStorage.getItem("delay") ?? DEFAULT_DELAY)
+    const delay = isNaN(tempDelay) ? DEFAULT_DELAY : tempDelay
+
     useTitle(webApp, 'Home')
 
     const [cardState, setCardState] = useState(new Map())
@@ -211,6 +275,7 @@ export function Home() {
     const friends = userInfo == null ? [] : userInfo.friends.map((value) =>
         <li key={value.friend} style={{listStyle: "none"}}>
             <FriendCard friend={value}
+                        delay={delay}
                         state={cardState.has(value.friend) ? cardState.get(value.friend) : FriendCardState.NORMAL}
                         setState={(state) => {
                             setCardState((val) => {
