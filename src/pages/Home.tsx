@@ -8,12 +8,11 @@ import {
     DialogContent,
     DialogTitle,
     IconButton, TextField,
-    Typography
+    Typography, useTheme
 } from "@mui/material";
 import {FloatingDiv} from "../utils/FloatingDiv";
 import {Close} from "@mui/icons-material";
 import {DEFAULT_DELAY, LIST_ELEMENT_PADDING, UPDATE_INTERVAL} from "../utils/defs";
-import Cookies from "js-cookie";
 
 const DEFAULT_PFP_SIZE = "40pt"
 
@@ -28,6 +27,7 @@ enum FriendCardState {
 interface FriendCardProps {
     friend: Friend,
     delay: number,
+    darkMode: boolean,
     state: FriendCardState,
     setState: (state: FriendCardState) => void,
 }
@@ -80,6 +80,9 @@ function FriendCard(props: FriendCardProps) {
             }
         }
     }, [props.delay, props.state])
+
+    const progressBG = props.darkMode ? useTheme().palette.primary.light : useTheme().palette.primary.dark
+    const progressFG = props.darkMode ? useTheme().palette.primary.dark : useTheme().palette.primary.light
 
     switch (props.state) {
         case FriendCardState.SEND:
@@ -136,9 +139,32 @@ function FriendCard(props: FriendCardProps) {
             </FloatingDiv>
             break
         case FriendCardState.CANCEL:
-            // TODO replace with correct colors
-            overlay = <div style={{width: "100%", height: "100%", position: "absolute", backgroundColor: "#000", ...style}}>
-                <div style={{width: `${cancelProgress / (1000 * props.delay)}%`, height: "100%", borderRadius: "1rem", transition: `${UPDATE_INTERVAL / 1000}s linear`, backgroundColor: "#fff"}}/>
+            overlay = <div style={{
+                width: "100%",
+                height: "100%",
+                position: "absolute",
+                backgroundColor: progressBG,
+                display: "flex",
+                alignItems: "center",
+                justifyItems: "center",
+                ...style
+            }} onClick={(e) => {
+                e.preventDefault()
+                props.setState(FriendCardState.NORMAL)
+            }
+            }>
+                <div style={{
+                    width: `${cancelProgress / (1000 * props.delay)}%`,
+                    height: "100%",
+                    borderRadius: "1rem",
+                    transition: `${UPDATE_INTERVAL / 1000}s linear`,
+                    backgroundColor: progressFG,
+                    position: "absolute",
+                    zIndex: 0
+                }}/>
+                <div style={{zIndex: 1}}>
+                    Cancel
+                </div>
             </div>
             break
         default:
@@ -261,7 +287,7 @@ function FriendCard(props: FriendCardProps) {
 
 export function Home() {
 
-    const {webApp, userInfo} = useProps()
+    const {webApp, darkMode, userInfo} = useProps()
 
     console.log(userInfo)
 
@@ -276,6 +302,7 @@ export function Home() {
         <li key={value.friend} style={{listStyle: "none"}}>
             <FriendCard friend={value}
                         delay={delay}
+                        darkMode={darkMode}
                         state={cardState.has(value.friend) ? cardState.get(value.friend) : FriendCardState.NORMAL}
                         setState={(state) => {
                             setCardState((val) => {

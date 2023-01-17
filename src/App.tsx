@@ -62,6 +62,8 @@ function App() {
         userInfo: userInfo.data.data
     }
 
+    // TODO on launch, try to register the device
+
     return (
         <div className="App">
             <Outlet context={props}/>
