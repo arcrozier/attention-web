@@ -252,7 +252,7 @@ function FriendCard(props: FriendCardProps) {
                 </DialogActions>
             </Dialog>
             <Dialog
-                onClose={() => setAddMessage(false)}
+                onClose={() => setNameDialog(false)}
                 open={nameDialog}>
                 <DialogTitle>Change name for {friend.friend}</DialogTitle>
                 <DialogContent>
@@ -272,10 +272,10 @@ function FriendCard(props: FriendCardProps) {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setAddMessage(false)}>Cancel</Button>
+                    <Button onClick={() => setNameDialog(false)}>Cancel</Button>
                     <Button variant={"contained"} onClick={() => {
                         // TODO send request
-                        setAddMessage(false)
+                        setNameDialog(false)
                     }
                     }>Okay</Button>
                 </DialogActions>
