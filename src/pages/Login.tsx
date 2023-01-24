@@ -20,7 +20,7 @@ import {
 } from "../utils/defs";
 import {LoadingButton} from "@mui/lab";
 import {Link} from "react-router-dom";
-import {checkLogin, createAccount, getUserInfo, login} from "../utils/repository";
+import {checkLogin, createAccount, login} from "../utils/repository";
 import Cookies from "js-cookie";
 
 declare global {
