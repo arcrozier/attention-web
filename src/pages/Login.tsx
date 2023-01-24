@@ -1,4 +1,4 @@
-import {useTitle, useProps, useBack} from "../Root";
+import {useTitle, useProps, useBack, useLogout} from "../Root";
 import {Logo} from "../utils/images";
 import React, {useEffect, useState} from "react";
 import {
@@ -13,14 +13,15 @@ import {ArrowBack, Check, Close, Visibility, VisibilityOff} from "@mui/icons-mat
 import {Outlet, useNavigate} from "react-router-dom";
 import {
     couldBeEmail,
-    LIST_ELEMENT_PADDING,
+    LIST_ELEMENT_PADDING, SESSION_ID_COOKIE,
     stripNewlines,
     TextFieldStatus,
     usernameChanged
 } from "../utils/defs";
 import {LoadingButton} from "@mui/lab";
 import {Link} from "react-router-dom";
-import {createAccount, login} from "../utils/repository";
+import {checkLogin, createAccount, getUserInfo, login} from "../utils/repository";
+import Cookies from "js-cookie";
 
 declare global {
     interface Window {
@@ -65,6 +66,21 @@ export function AuthRoot() {
 export function Login() {
 
     const {webApp, darkMode} = useProps()
+
+    useEffect(() => {
+        const logout = useLogout()
+        if (Cookies.get(SESSION_ID_COOKIE)) {
+            checkLogin().then(() => {
+                navigate('/', {replace: true})
+            }).catch((error) => {
+                if (error.response && error.response.status === 403) {
+                    logout(false)
+                }
+            })
+        } else {
+            logout(false)
+        }
+    }, [])
 
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
@@ -186,6 +202,10 @@ export function Login() {
 export function CreateAccount() {
 
     const {webApp, darkMode} = useProps()
+
+    useEffect(() => {
+        useLogout()(false)
+    }, [])
 
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')

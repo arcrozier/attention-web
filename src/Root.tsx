@@ -32,6 +32,15 @@ export function useBack() {
     }
 }
 
+export function useLogout(): (redirect?: boolean) => void {
+
+    return (redirect: boolean = true) => {
+        // todo clear local storage + session cookie, replace page with login page
+        const navigate = useNavigate()
+        navigate('/login', {replace: true})
+    }
+}
+
 function supportsApp(): boolean {
 
     const stringAppSupport = (platform: string, userAgent: string): boolean => {

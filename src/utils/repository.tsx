@@ -25,6 +25,11 @@ export async function getUserInfo(): Promise<AxiosResponse<APIResult<UserInfo>>>
     return axios.get(`${BASE_URL}get_info/`)
 }
 
+export async function checkLogin(): Promise<AxiosResponse> {
+    await requireCSRF()
+    return axios.head(`${BASE_URL}test_auth/`)
+}
+
 export async function setCSRFToken(): Promise<AxiosResponse> {
     console.log('Getting CSRF Token')
     return axios.get(`${BASE_URL}set_csrf/`)

@@ -1,6 +1,6 @@
 import {AppBar, IconButton, Toolbar, Typography, useScrollTrigger} from "@mui/material";
 import {Link} from "react-router-dom";
-import {Settings} from "@mui/icons-material";
+import {Refresh, Settings} from "@mui/icons-material";
 import React from "react";
 
 interface Props {
@@ -41,8 +41,13 @@ export function AttentionAppBar(props: AppBarProps) {
                         {props.title}
                     </Typography>
 
-                    {props.settings && <div>
-                        <IconButton
+                    <div>
+                        <IconButton size={"large"} aria-label={"refresh"} onClick={() => {
+                            // todo
+                        }}>
+                            <Refresh />
+                        </IconButton>
+                        {props.settings && <IconButton
                             size="large"
                             aria-label="settings"
                             aria-controls="menu-appbar"
@@ -52,8 +57,8 @@ export function AttentionAppBar(props: AppBarProps) {
                             color="inherit"
                         >
                             <Settings />
-                        </IconButton>
-                    </div>}
+                        </IconButton>}
+                    </div>
                 </Toolbar>
             </AppBar>
 

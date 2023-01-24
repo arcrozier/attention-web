@@ -3,11 +3,12 @@ import {Friend, useProps} from "../App";
 import {useTitle} from "../Root";
 import {AttentionAppBar} from "../utils/AttentionAppBar";
 import {
+    Alert,
     Button,
     Dialog, DialogActions,
     DialogContent,
     DialogTitle,
-    IconButton, TextField,
+    IconButton, Snackbar, TextField,
     Typography, useTheme
 } from "@mui/material";
 import {FloatingDiv} from "../utils/FloatingDiv";
@@ -30,6 +31,14 @@ interface FriendCardProps {
     darkMode: boolean,
     state: FriendCardState,
     setState: (state: FriendCardState) => void,
+    setSnackBar: (snackbar: SnackbarStatus | null) => void,
+}
+
+
+interface SnackbarStatus {
+    severity: 'error' | 'info' | 'success' | 'warning',
+    message: string,
+    autoHideDuration: number | null,
 }
 
 
@@ -280,6 +289,19 @@ function FriendCard(props: FriendCardProps) {
                     }>Okay</Button>
                 </DialogActions>
             </Dialog>
+            <Dialog
+                onClose={() => setDeleteDialog(false)}
+                open={deleteDialog}>
+                <DialogTitle>Delete {friend.name}?</DialogTitle>
+                <DialogActions>
+                    <Button onClick={() => setDeleteDialog(false)}>Cancel</Button>
+                    <Button variant={"contained"} color={"error"} onClick={() => {
+                        // TODO send request
+                        setNameDialog(false)
+                    }
+                    }>Delete</Button>
+                </DialogActions>
+            </Dialog>
         </div>
     )
 }
@@ -288,6 +310,8 @@ function FriendCard(props: FriendCardProps) {
 export function Home() {
 
     const {webApp, darkMode, userInfo} = useProps()
+
+    const [snackbar, setSnackbar] = useState<SnackbarStatus | null>(null)
 
     console.log(userInfo)
 
@@ -310,11 +334,10 @@ export function Home() {
                                 clone.set(value.friend, state)
                                 return clone
                             })
-                        }}/>
+                        }}
+            setSnackBar={setSnackbar}/>
         </li>
     )
-
-    // TODO reload?
 
     return (
         <div className="App">
@@ -322,6 +345,11 @@ export function Home() {
             <ul style={{padding: 0, margin: 0}}>
                 {friends}
             </ul>
+            <Snackbar open={snackbar !== null} onClose={() => setSnackbar(null)} autoHideDuration={snackbar?.autoHideDuration}>
+                <Alert onClose={() => setSnackbar(null)} severity={snackbar?.severity}>
+                    {snackbar?.message}
+                </Alert>
+            </Snackbar>
         </div>
     );
 }

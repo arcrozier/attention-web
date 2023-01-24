@@ -2,15 +2,23 @@ import {Link, useNavigate, useRouteError} from "react-router-dom";
 import {AxiosError} from "axios";
 import React, {useEffect} from "react";
 import {Button, createTheme, responsiveFontSizes, useMediaQuery} from "@mui/material";
+import {useLogout} from "../Root";
 
 export default function ErrorPage() {
     const error = useRouteError() as any;
     const navigate = useNavigate()
 
     useEffect(() => {
+        const logout = useLogout()
         if (error instanceof AxiosError) {
-            if (error.response?.status === 403) {
-                navigate('/login', {replace: true})
+            switch (error.response?.status) {
+                case 403:
+                    logout()
+                    break
+                case 404:
+                    console.error("Received 404: " + JSON.stringify(error.response))
+                    navigate('/', {replace: true})
+                    break
             }
         }
     }, [error, navigate])

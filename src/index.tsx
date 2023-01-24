@@ -21,6 +21,7 @@ const router = createBrowserRouter([
         errorElement: <ErrorPage />,
         children: [
             {
+                // todo somehow get add/?username=<username> to work
                 path: "/",
                 element: <App />,
                 loader: rootLoader,
