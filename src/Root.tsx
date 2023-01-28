@@ -2,19 +2,32 @@ import React, {useEffect, useState} from "react";
 import {Outlet, useNavigate, useOutletContext} from "react-router-dom";
 import Cookies from "js-cookie";
 import {
+    Alert,
     createTheme,
     IconButton,
-    responsiveFontSizes,
+    responsiveFontSizes, Snackbar,
     ThemeProvider,
     Typography,
     useMediaQuery
 } from "@mui/material";
 import {Close} from "@mui/icons-material";
+import {SESSION_ID_COOKIE} from "./utils/defs";
 
 
 export interface Properties {
     darkMode: boolean,
     webApp: boolean
+}
+
+
+export interface SnackbarStatus {
+    severity: 'error' | 'info' | 'success' | 'warning',
+    message: string,
+    autoHideDuration: number | null,
+}
+
+export function useSnackBarStatus() {
+    return useState<SnackbarStatus | null>(null)
 }
 
 export function useProps() {
@@ -32,15 +45,28 @@ export function useBack() {
     }
 }
 
+/**
+ * Returns a function that performs a logout
+ *
+ * redirect: boolean - whether to redirect to the login page after logging out (defaults to true)
+ */
 export function useLogout(): (redirect?: boolean) => void {
+    const navigate = useNavigate()
 
     return (redirect: boolean = true) => {
-        // todo clear local storage + session cookie, replace page with login page
-        const navigate = useNavigate()
-        navigate('/login', {replace: true})
+        Cookies.remove(SESSION_ID_COOKIE)
+        window.localStorage.clear()
+        if (redirect) {
+            navigate('/login', {replace: true})
+        }
     }
 }
 
+/**
+ * Returns whether the device supports a native app
+ *
+ * Currently, only true for Android and ChromeOS
+ */
 function supportsApp(): boolean {
 
     const stringAppSupport = (platform: string, userAgent: string): boolean => {
@@ -93,6 +119,8 @@ export default function Root() {
         webApp: isWebApp
     }
 
+    const [snackbar, setSnackbar] = useSnackBarStatus()
+
     const primaryColor = darkMode ? theme.palette.primary.dark : theme.palette.primary.light
     const appBtn = <a className={'btn center'} style={{
         width: "100%",
@@ -138,11 +166,21 @@ export default function Root() {
                 <Outlet context={props}/>
                 {showPrompt && appBtn}
             </div>
+            <Snackbar open={snackbar !== null} onClose={() => setSnackbar(null)} autoHideDuration={snackbar?.autoHideDuration}>
+                <Alert onClose={() => setSnackbar(null)} severity={snackbar?.severity}>
+                    {snackbar?.message}
+                </Alert>
+            </Snackbar>
         </ThemeProvider>
     )
 }
 
-
+/**
+ * Sets the title for the page
+ *
+ * @param webApp - whether it is running as a standalone web app
+ * @param page - the name of the page
+ */
 export function useTitle(webApp: boolean, page: string) {
     useEffect(() => {
         document.title = (webApp ? '' : 'Attention! ') + page

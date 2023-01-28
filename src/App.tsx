@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import './App.css';
 import {
     Outlet,
@@ -8,6 +8,8 @@ import {
 import {APIResult, getUserInfo} from "./utils/repository";
 import {Properties, useProps as useRootProps} from "./Root";
 import {AxiosResponse} from "axios";
+
+const ICON_URL = process.env.PUBLIC_URL + '/icon.svg'
 
 // TODO https://create-react-app.dev/docs/making-a-progressive-web-app/
 // offline support - support cached friends? No
@@ -50,6 +52,40 @@ export function useProps() {
     return useOutletContext<AppProperties>()
 }
 
+export function notify(title: string, options: NotificationOptions | undefined = undefined, onclick: ((this: Notification, ev: Event) => any) | null = null): boolean {
+    // set defaults
+    options = {...{badge: ICON_URL, icon: ICON_URL, renotify: true}, ...options}
+    if (!("Notification" in window)) {
+        return false
+    } else if (Notification.permission === "granted") {
+        // Check whether notification permissions have already been granted;
+        // if so, create a notification
+        const notification = new Notification(title, options)
+        notification.onclick = onclick
+        return true
+    } else if (Notification.permission !== "denied") {
+        // We need to ask the user for permission
+        Notification.requestPermission().then((permission) => {
+            // If the user accepts, let's create a notification
+            if (permission === "granted") {
+                const notification = new Notification(title, options);
+                notification.onclick = onclick
+            }
+        });
+    }
+    return false
+}
+
+function requestNotificationPermission() {
+    if (!("Notification" in window)) {
+        // Check if the browser supports notifications
+        return
+    } else if (Notification.permission !== "denied" && Notification.permission !== "granted") {
+        // We need to ask the user for permission
+        Notification.requestPermission().then()
+    }
+}
+
 function App() {
 
     const userInfo = useLoaderData() as AxiosResponse<APIResult<UserInfo>>
@@ -61,6 +97,12 @@ function App() {
         webApp: webApp,
         userInfo: userInfo.data.data
     }
+
+    useEffect(() => {
+        if (userInfo !== null) {
+            requestNotificationPermission()
+        }
+    }, [userInfo])
 
     // TODO on launch, try to register the device
 

@@ -1,19 +1,20 @@
 import React, {useCallback, useEffect, useState} from "react";
-import {Friend, useProps} from "../App";
-import {useTitle} from "../Root";
+import {Friend, notify, useProps} from "../App";
+import {SnackbarStatus, useLogout, useSnackBarStatus, useTitle} from "../Root";
 import {AttentionAppBar} from "../utils/AttentionAppBar";
 import {
-    Alert,
     Button,
     Dialog, DialogActions,
     DialogContent,
     DialogTitle,
-    IconButton, Snackbar, TextField,
+    IconButton, TextField,
     Typography, useTheme
 } from "@mui/material";
 import {FloatingDiv} from "../utils/FloatingDiv";
 import {Close} from "@mui/icons-material";
 import {DEFAULT_DELAY, LIST_ELEMENT_PADDING, UPDATE_INTERVAL} from "../utils/defs";
+import {sendMessage} from "../utils/repository";
+import {AxiosError} from "axios";
 
 const DEFAULT_PFP_SIZE = "40pt"
 
@@ -35,15 +36,13 @@ interface FriendCardProps {
 }
 
 
-interface SnackbarStatus {
-    severity: 'error' | 'info' | 'success' | 'warning',
-    message: string,
-    autoHideDuration: number | null,
-}
-
-
 function FriendCard(props: FriendCardProps) {
     const friend = props.friend
+
+    const logout = useLogout()
+
+    const [sendingStatus, setSendingStatus] = useState<string | null>(null)
+    const [sendError, setSendError] = useState(false)
 
     const style = {
         margin: `0 ${LIST_ELEMENT_PADDING} 0 ${LIST_ELEMENT_PADDING}`
@@ -80,7 +79,67 @@ function FriendCard(props: FriendCardProps) {
                 })
                 if (cancelProgress >= props.delay * 1000) {
                     props.setState(FriendCardState.NORMAL)
-                    // TODO send request
+                    setSendingStatus("Sending...")
+                    setSendError(false)
+                    sendMessage(friend.friend, message?.length === 0 ? null : message).then(() => {
+                        props.setSnackBar({
+                            severity: 'success',
+                            message: 'Successfully sent alert',
+                            autoHideDuration: 600
+                        })
+                    }).catch((e) => {
+                        setSendError(true)
+                        setSendingStatus('Error')
+                        if (e instanceof AxiosError) {
+                            const message = e.message
+                            // TODO onclick for each notification
+                            switch (e.status) {
+                                case 403:
+                                    if (message.includes('does not have you as a friend')) {
+                                        const text = `Could not send message because ${friend.name} does not have you as a friend`
+                                        props.setSnackBar({
+                                            severity: 'error',
+                                            message: notify(text) ? 'Error' : text,
+                                            autoHideDuration: null
+                                        })
+                                    } else {
+                                        logout()
+                                    }
+                                    break
+                                case 400:
+                                    if (message.includes('Could not find user')) {
+                                        const text = `Could not send alert because ${friend.name} does not exist`
+                                        props.setSnackBar({
+                                            severity: 'error',
+                                            message: notify(text) ? 'Error' : text,
+                                            autoHideDuration: null
+                                        })
+                                    } else {
+                                        const text = `Could not send alert to ${friend.name}`
+                                        props.setSnackBar({
+                                            severity: 'error',
+                                            message: notify(text) ? 'Error' : text,
+                                            autoHideDuration: null
+                                        })
+                                    }
+                                    break
+                                default:
+                                    const text = `Could not send alert to ${friend.name}; check your network connection and try again`
+                                    props.setSnackBar({
+                                        severity: 'error',
+                                        message: notify(text) ? 'Error' : text,
+                                        autoHideDuration: null
+                                    })
+                            }
+                        } else {
+                            const text = `Could not send alert to ${friend.name}; check your network connection and try again`
+                            props.setSnackBar({
+                                severity: 'error',
+                                message: notify(text) ? 'Error' : text,
+                                autoHideDuration: null
+                            })
+                        }
+                    })
                 }
             }, UPDATE_INTERVAL)
             return () => {
@@ -180,6 +239,13 @@ function FriendCard(props: FriendCardProps) {
             overlay = null
     }
 
+    let sendSubtitle
+    if (sendingStatus !== null) {
+        sendSubtitle = sendingStatus
+    } else {
+        sendSubtitle = friend.last_message_status
+    }
+
     return (
         <div style={{
             width: "100%",
@@ -225,10 +291,15 @@ function FriendCard(props: FriendCardProps) {
                      src={`data:image/png;base64,${friend.photo}`}
                      alt={`Profile for ${friend.name}`}/>}
             </div>
-            <div style={{flexGrow: 1}}>
+            <div style={{flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'left', justifyItems: 'center'}}>
                 <Typography variant={"h6"}>
                     {friend.name}
                 </Typography>
+                {friend.last_message_status !== null && sendingStatus !== null &&
+                    <Typography variant={"subtitle2"} color={sendError ? 'error' : 'text.disabled'}>
+                        {sendSubtitle}
+                </Typography>
+                }
             </div>
             {overlay !== null && overlay}
             <Dialog
@@ -311,7 +382,7 @@ export function Home() {
 
     const {webApp, darkMode, userInfo} = useProps()
 
-    const [snackbar, setSnackbar] = useState<SnackbarStatus | null>(null)
+    const [, setSnackbar] = useSnackBarStatus()
 
     console.log(userInfo)
 
@@ -345,11 +416,6 @@ export function Home() {
             <ul style={{padding: 0, margin: 0}}>
                 {friends}
             </ul>
-            <Snackbar open={snackbar !== null} onClose={() => setSnackbar(null)} autoHideDuration={snackbar?.autoHideDuration}>
-                <Alert onClose={() => setSnackbar(null)} severity={snackbar?.severity}>
-                    {snackbar?.message}
-                </Alert>
-            </Snackbar>
         </div>
     );
 }
