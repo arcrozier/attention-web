@@ -1,25 +1,29 @@
-import {useTitle, useProps, useBack, useLogout} from "../Root";
+import {useBack, useLogout, useProps, useTitle} from "../Root";
 import {Logo} from "../utils/images";
 import React, {useEffect, useState} from "react";
 import {
-    Button, Checkbox,
-    Divider, FormControlLabel,
+    Button,
+    Checkbox,
+    Divider,
+    FormControlLabel,
     IconButton,
     InputAdornment,
-    TextField, Tooltip,
-    Typography, useTheme
+    TextField,
+    Tooltip,
+    Typography,
+    useTheme
 } from "@mui/material";
 import {ArrowBack, Check, Close, Visibility, VisibilityOff} from "@mui/icons-material";
-import {Outlet, useNavigate} from "react-router-dom";
+import {Link, Outlet, useNavigate} from "react-router-dom";
 import {
     couldBeEmail,
-    LIST_ELEMENT_PADDING, SESSION_ID_COOKIE,
+    LIST_ELEMENT_PADDING,
+    SESSION_ID_COOKIE,
     stripNewlines,
     TextFieldStatus,
     usernameChanged
 } from "../utils/defs";
 import {LoadingButton} from "@mui/lab";
-import {Link} from "react-router-dom";
 import {checkLogin, createAccount, login} from "../utils/repository";
 import Cookies from "js-cookie";
 
@@ -67,8 +71,10 @@ export function Login() {
 
     const {webApp, darkMode} = useProps()
 
+    const navigate = useNavigate()
+    const logout = useLogout()
+
     useEffect(() => {
-        const logout = useLogout()
         if (Cookies.get(SESSION_ID_COOKIE)) {
             checkLogin().then(() => {
                 navigate('/', {replace: true})
@@ -80,7 +86,7 @@ export function Login() {
         } else {
             logout(false)
         }
-    }, [])
+    }, [navigate, logout])
 
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
@@ -91,7 +97,6 @@ export function Login() {
         message: ''
     })
 
-    const navigate = useNavigate()
 
     useGoogleSignIn()
 
@@ -202,10 +207,11 @@ export function Login() {
 export function CreateAccount() {
 
     const {webApp, darkMode} = useProps()
+    const logout = useLogout()
 
     useEffect(() => {
-        useLogout()(false)
-    }, [])
+        logout(false)
+    }, [logout])
 
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')

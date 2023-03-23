@@ -6,7 +6,7 @@ import {
     Button,
     Dialog, DialogActions,
     DialogContent,
-    DialogTitle,
+    DialogTitle, Divider,
     IconButton, TextField,
     Typography, useTheme
 } from "@mui/material";
@@ -37,7 +37,7 @@ interface FriendCardProps {
 
 
 function FriendCard(props: FriendCardProps) {
-    const friend = props.friend
+    const {friend, delay, state, setState, setSnackBar} = props;
 
     const logout = useLogout()
 
@@ -68,21 +68,22 @@ function FriendCard(props: FriendCardProps) {
     const [message, setMessage] = useState<string | null>(null)
     let overlay: React.ReactElement | null
 
+
     useEffect(() => {
-        if (props.state === FriendCardState.CANCEL) {
+        if (state === FriendCardState.CANCEL) {
             const interval = setInterval(() => {
                 setCancelProgress((prevState) => {
-                    if (prevState + UPDATE_INTERVAL <= props.delay * 1000) {
+                    if (prevState + UPDATE_INTERVAL <= delay * 1000) {
                         return prevState + UPDATE_INTERVAL
                     }
-                    return props.delay * 1000
+                    return delay * 1000
                 })
-                if (cancelProgress >= props.delay * 1000) {
-                    props.setState(FriendCardState.NORMAL)
+                if (cancelProgress >= delay * 1000) {
+                    setState(FriendCardState.NORMAL)
                     setSendingStatus("Sending...")
                     setSendError(false)
                     sendMessage(friend.friend, message?.length === 0 ? null : message).then(() => {
-                        props.setSnackBar({
+                        setSnackBar({
                             severity: 'success',
                             message: 'Successfully sent alert',
                             autoHideDuration: 600
@@ -97,7 +98,7 @@ function FriendCard(props: FriendCardProps) {
                                 case 403:
                                     if (message.includes('does not have you as a friend')) {
                                         const text = `Could not send message because ${friend.name} does not have you as a friend`
-                                        props.setSnackBar({
+                                        setSnackBar({
                                             severity: 'error',
                                             message: notify(text) ? 'Error' : text,
                                             autoHideDuration: null
@@ -109,14 +110,14 @@ function FriendCard(props: FriendCardProps) {
                                 case 400:
                                     if (message.includes('Could not find user')) {
                                         const text = `Could not send alert because ${friend.name} does not exist`
-                                        props.setSnackBar({
+                                        setSnackBar({
                                             severity: 'error',
                                             message: notify(text) ? 'Error' : text,
                                             autoHideDuration: null
                                         })
                                     } else {
                                         const text = `Could not send alert to ${friend.name}`
-                                        props.setSnackBar({
+                                        setSnackBar({
                                             severity: 'error',
                                             message: notify(text) ? 'Error' : text,
                                             autoHideDuration: null
@@ -125,7 +126,7 @@ function FriendCard(props: FriendCardProps) {
                                     break
                                 default:
                                     const text = `Could not send alert to ${friend.name}; check your network connection and try again`
-                                    props.setSnackBar({
+                                    setSnackBar({
                                         severity: 'error',
                                         message: notify(text) ? 'Error' : text,
                                         autoHideDuration: null
@@ -133,7 +134,7 @@ function FriendCard(props: FriendCardProps) {
                             }
                         } else {
                             const text = `Could not send alert to ${friend.name}; check your network connection and try again`
-                            props.setSnackBar({
+                            setSnackBar({
                                 severity: 'error',
                                 message: notify(text) ? 'Error' : text,
                                 autoHideDuration: null
@@ -147,10 +148,11 @@ function FriendCard(props: FriendCardProps) {
                 setCancelProgress(0)
             }
         }
-    }, [props.delay, props.state])
+    }, [friend, delay, state, setState, setSnackBar, message, logout, cancelProgress])
 
-    const progressBG = props.darkMode ? useTheme().palette.primary.light : useTheme().palette.primary.dark
-    const progressFG = props.darkMode ? useTheme().palette.primary.dark : useTheme().palette.primary.light
+    const theme = useTheme()
+    const progressBG = props.darkMode ? theme.palette.primary.light : theme.palette.primary.dark
+    const progressFG = props.darkMode ? theme.palette.primary.dark : theme.palette.primary.light
 
     switch (props.state) {
         case FriendCardState.SEND:
@@ -247,132 +249,146 @@ function FriendCard(props: FriendCardProps) {
     }
 
     return (
-        <div style={{
-            width: "100%",
-            height: "48pt",
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            cursor: "pointer",
-            position: "relative"
-        }} ref={outerRef} onClick={(e) => {
-            e.preventDefault()
-            console.log(e.nativeEvent)
-            setDisplayX(e.clientX - e.currentTarget.getBoundingClientRect().left)
-            switch (props.state) {
-                case FriendCardState.NORMAL:
-                    props.setState(FriendCardState.SEND)
-                    break
-                case FriendCardState.CANCEL:
-                case FriendCardState.SEND:
-                case FriendCardState.EDIT:
-                    props.setState(FriendCardState.NORMAL)
-                    break
+        <div>
+            <div style={{
+                width: "100%",
+                height: "48pt",
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                cursor: "pointer",
+                position: "relative"
+            }} ref={outerRef} onClick={(e) => {
+                e.preventDefault()
+                console.log(e.nativeEvent)
+                setDisplayX(e.clientX - e.currentTarget.getBoundingClientRect().left)
+                switch (props.state) {
+                    case FriendCardState.NORMAL:
+                        props.setState(FriendCardState.SEND)
+                        break
+                    case FriendCardState.CANCEL:
+                    case FriendCardState.SEND:
+                    case FriendCardState.EDIT:
+                        props.setState(FriendCardState.NORMAL)
+                        break
+                }
             }
-        }
-        } onContextMenu={(e) => {
-            e.preventDefault()
-            setDisplayX(e.nativeEvent.offsetX)
-            switch (props.state) {
-                case FriendCardState.NORMAL:
-                case FriendCardState.SEND:
-                    props.setState(FriendCardState.EDIT)
-                    break
+            } onContextMenu={(e) => {
+                e.preventDefault()
+                setDisplayX(e.nativeEvent.offsetX)
+                switch (props.state) {
+                    case FriendCardState.NORMAL:
+                    case FriendCardState.SEND:
+                        props.setState(FriendCardState.EDIT)
+                        break
+                }
             }
-        }
-        }>
-            <div style={{width: DEFAULT_PFP_SIZE, height: DEFAULT_PFP_SIZE, margin: "0 8pt 0 8pt"}}>
-                {friend.photo != null &&
-                <img style={{
-                    height: DEFAULT_PFP_SIZE, width: DEFAULT_PFP_SIZE,
-                    objectFit: "cover",
-                    borderRadius: "50%"
-                }}
-                     src={`data:image/png;base64,${friend.photo}`}
-                     alt={`Profile for ${friend.name}`}/>}
-            </div>
-            <div style={{flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'left', justifyItems: 'center'}}>
-                <Typography variant={"h6"}>
-                    {friend.name}
-                </Typography>
-                {friend.last_message_status !== null && sendingStatus !== null &&
+            }>
+                <div style={{
+                    width: DEFAULT_PFP_SIZE,
+                    height: DEFAULT_PFP_SIZE,
+                    margin: "0 8pt 0 8pt"
+                }}>
+                    {friend.photo != null &&
+                    <img style={{
+                        height: DEFAULT_PFP_SIZE, width: DEFAULT_PFP_SIZE,
+                        objectFit: "cover",
+                        borderRadius: "50%"
+                    }}
+                         src={`data:image/png;base64,${friend.photo}`}
+                         alt={`Profile for ${friend.name}`}/>}
+                </div>
+                <div style={{
+                    flexGrow: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'left',
+                    justifyItems: 'center'
+                }}>
+                    <Typography variant={"h6"}>
+                        {friend.name}
+                    </Typography>
+                    {friend.last_message_status !== null && sendingStatus !== null &&
                     <Typography variant={"subtitle2"} color={sendError ? 'error' : 'text.disabled'}>
                         {sendSubtitle}
-                </Typography>
-                }
+                    </Typography>
+                    }
+                </div>
+                {/* TODO animate overlay with Transition */}
+                {overlay !== null && overlay}
+                <Dialog
+                    onClose={() => setAddMessage(false)}
+                    open={addMessage}>
+                    <DialogTitle>Send custom message to {friend.name}</DialogTitle>
+                    <DialogContent>
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            id="message"
+                            label={`Message to ${friend.name}`}
+                            type="text"
+                            value={message}
+                            onChange={(e) => {
+                                setMessage(e.target.value)
+                            }
+                            }
+                            fullWidth
+                            variant="standard"
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setAddMessage(false)}>Cancel</Button>
+                        <Button variant={"contained"} onClick={() => {
+                            props.setState(FriendCardState.CANCEL)
+                            setAddMessage(false)
+                        }
+                        }>Send</Button>
+                    </DialogActions>
+                </Dialog>
+                <Dialog
+                    onClose={() => setNameDialog(false)}
+                    open={nameDialog}>
+                    <DialogTitle>Change name for {friend.friend}</DialogTitle>
+                    <DialogContent>
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            id="message"
+                            label={`Name`}
+                            type="text"
+                            value={name}
+                            onChange={(e) => {
+                                setName(e.target.value)
+                            }
+                            }
+                            fullWidth
+                            variant="standard"
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setNameDialog(false)}>Cancel</Button>
+                        <Button variant={"contained"} onClick={() => {
+                            // TODO send request
+                            setNameDialog(false)
+                        }
+                        }>Okay</Button>
+                    </DialogActions>
+                </Dialog>
+                <Dialog
+                    onClose={() => setDeleteDialog(false)}
+                    open={deleteDialog}>
+                    <DialogTitle>Delete {friend.name}?</DialogTitle>
+                    <DialogActions>
+                        <Button onClick={() => setDeleteDialog(false)}>Cancel</Button>
+                        <Button variant={"contained"} color={"error"} onClick={() => {
+                            // TODO send request
+                            setNameDialog(false)
+                        }
+                        }>Delete</Button>
+                    </DialogActions>
+                </Dialog>
             </div>
-            {overlay !== null && overlay}
-            <Dialog
-                onClose={() => setAddMessage(false)}
-                open={addMessage}>
-                <DialogTitle>Send custom message to {friend.name}</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        id="message"
-                        label={`Message to ${friend.name}`}
-                        type="text"
-                        value={message}
-                        onChange={(e) => {
-                            setMessage(e.target.value)
-                        }
-                        }
-                        fullWidth
-                        variant="standard"
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setAddMessage(false)}>Cancel</Button>
-                    <Button variant={"contained"} onClick={() => {
-                        props.setState(FriendCardState.CANCEL)
-                        setAddMessage(false)
-                    }
-                    }>Send</Button>
-                </DialogActions>
-            </Dialog>
-            <Dialog
-                onClose={() => setNameDialog(false)}
-                open={nameDialog}>
-                <DialogTitle>Change name for {friend.friend}</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        id="message"
-                        label={`Name`}
-                        type="text"
-                        value={name}
-                        onChange={(e) => {
-                            setName(e.target.value)
-                        }
-                        }
-                        fullWidth
-                        variant="standard"
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setNameDialog(false)}>Cancel</Button>
-                    <Button variant={"contained"} onClick={() => {
-                        // TODO send request
-                        setNameDialog(false)
-                    }
-                    }>Okay</Button>
-                </DialogActions>
-            </Dialog>
-            <Dialog
-                onClose={() => setDeleteDialog(false)}
-                open={deleteDialog}>
-                <DialogTitle>Delete {friend.name}?</DialogTitle>
-                <DialogActions>
-                    <Button onClick={() => setDeleteDialog(false)}>Cancel</Button>
-                    <Button variant={"contained"} color={"error"} onClick={() => {
-                        // TODO send request
-                        setNameDialog(false)
-                    }
-                    }>Delete</Button>
-                </DialogActions>
-            </Dialog>
+            <Divider variant={"middle"}/>
         </div>
     )
 }
@@ -393,21 +409,26 @@ export function Home() {
 
     const [cardState, setCardState] = useState(new Map())
 
-    const friends = userInfo == null ? [] : userInfo.friends.map((value) =>
-        <li key={value.friend} style={{listStyle: "none"}}>
-            <FriendCard friend={value}
-                        delay={delay}
-                        darkMode={darkMode}
-                        state={cardState.has(value.friend) ? cardState.get(value.friend) : FriendCardState.NORMAL}
-                        setState={(state) => {
-                            setCardState((val) => {
-                                const clone = new Map(val);
-                                clone.set(value.friend, state)
-                                return clone
-                            })
-                        }}
-            setSnackBar={setSnackbar}/>
-        </li>
+    const friends = userInfo == null ? [] : userInfo.friends.map((value) => {
+            const list = []
+            for (let i = 0; i < 20; i++) {
+                list.push(<li key={value.friend + i} style={{listStyle: "none"}}>
+                    <FriendCard friend={value}
+                                delay={delay}
+                                darkMode={darkMode}
+                                state={cardState.has(value.friend) ? cardState.get(value.friend) : FriendCardState.NORMAL}
+                                setState={(state) => {
+                                    setCardState((val) => {
+                                        const clone = new Map(val);
+                                        clone.set(value.friend, state)
+                                        return clone
+                                    })
+                                }}
+                                setSnackBar={setSnackbar}/>
+                </li>)
+            }
+            return list
+        }
     )
 
     return (

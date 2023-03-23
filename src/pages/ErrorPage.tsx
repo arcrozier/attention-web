@@ -7,9 +7,9 @@ import {useLogout} from "../Root";
 export default function ErrorPage() {
     const error = useRouteError() as any;
     const navigate = useNavigate()
+    const logout = useLogout()
 
     useEffect(() => {
-        const logout = useLogout()
         if (error instanceof AxiosError) {
             switch (error.response?.status) {
                 case 403:
@@ -21,7 +21,7 @@ export default function ErrorPage() {
                     break
             }
         }
-    }, [error, navigate])
+    }, [error, navigate, logout])
 
 
     const darkMode = useMediaQuery('(prefers-color-scheme: dark)');
