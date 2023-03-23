@@ -4,11 +4,15 @@ import {SnackbarStatus, useLogout, useSnackBarStatus, useTitle} from "../Root";
 import {AttentionAppBar} from "../utils/AttentionAppBar";
 import {
     Button,
-    Dialog, DialogActions,
+    Dialog,
+    DialogActions,
     DialogContent,
-    DialogTitle, Divider,
-    IconButton, TextField,
-    Typography, useTheme
+    DialogTitle,
+    Divider,
+    IconButton,
+    TextField,
+    Typography,
+    useTheme
 } from "@mui/material";
 import {FloatingDiv} from "../utils/FloatingDiv";
 import {Close} from "@mui/icons-material";
@@ -409,26 +413,21 @@ export function Home() {
 
     const [cardState, setCardState] = useState(new Map())
 
-    const friends = userInfo == null ? [] : userInfo.friends.map((value) => {
-            const list = []
-            for (let i = 0; i < 20; i++) {
-                list.push(<li key={value.friend + i} style={{listStyle: "none"}}>
-                    <FriendCard friend={value}
-                                delay={delay}
-                                darkMode={darkMode}
-                                state={cardState.has(value.friend) ? cardState.get(value.friend) : FriendCardState.NORMAL}
-                                setState={(state) => {
-                                    setCardState((val) => {
-                                        const clone = new Map(val);
-                                        clone.set(value.friend, state)
-                                        return clone
-                                    })
-                                }}
-                                setSnackBar={setSnackbar}/>
-                </li>)
-            }
-            return list
-        }
+    const friends = userInfo == null ? [] : userInfo.friends.map((value) =>
+        <li key={value.friend} style={{listStyle: "none"}}>
+            <FriendCard friend={value}
+                        delay={delay}
+                        darkMode={darkMode}
+                        state={cardState.has(value.friend) ? cardState.get(value.friend) : FriendCardState.NORMAL}
+                        setState={(state) => {
+                            setCardState((val) => {
+                                const clone = new Map(val);
+                                clone.set(value.friend, state)
+                                return clone
+                            })
+                        }}
+                        setSnackBar={setSnackbar}/>
+        </li>
     )
 
     return (
