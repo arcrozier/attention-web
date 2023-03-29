@@ -55,16 +55,16 @@ function FriendCard(props: FriendCardProps) {
     }
 
     const defaultStyle = {
-        transition: `height ${overlayDuration}ms ease-in-out`,
+        transition: `all ${overlayDuration}ms ease-in-out`,
         height: 0,
     }
 
     const transitionStyles = {
-        entering: {size: 'auto', opacity: 1},
-        entered: {size: 'auto', opacity: 1},
-        exiting: {size: 0, opacity: 0},
-        exited: {size: 0, opacity: 0},
-        unmounted: {size: 0, opacity: 0}
+        entering: {transform: 'scale(1)', opacity: 1},
+        entered: {transform: 'scale(1)', opacity: 1},
+        exiting: {transform: 'scale(0)', opacity: 0},
+        exited: {transform: 'scale(0)', opacity: 0},
+        unmounted: {transform: 'scale(0)', opacity: 0}
     };
 
     const [displayX, setDisplayX] = useState(0)
