@@ -11,8 +11,7 @@ import {Link, useRevalidator} from "react-router-dom";
 import {Refresh, Settings} from "@mui/icons-material";
 import React, {useRef} from "react";
 import {Transition} from 'react-transition-group';
-
-const duration = 200;
+import {useAnimations} from "../Root";
 
 interface Props {
     children: React.ReactElement;
@@ -37,20 +36,23 @@ export interface AppBarProps {
     settings: boolean
 }
 
-const defaultStyle = {
-    transition: `height ${duration}ms ease-in-out`,
-    height: 0,
-}
-
-const transitionStyles = {
-    entering: {height: '4px'},
-    entered: {height: '4px'},
-    exiting: {height: 0},
-    exited: {height: 0},
-    unmounted: {height: 0}
-};
-
 export function AttentionAppBar(props: AppBarProps) {
+
+    const duration = useAnimations() ? 200 : 0;
+
+    const defaultStyle = {
+        transition: `height ${duration}ms ease-in-out`,
+        height: 0,
+    }
+
+    const transitionStyles = {
+        entering: {height: '4px'},
+        entered: {height: '4px'},
+        exiting: {height: 0},
+        exited: {height: 0},
+        unmounted: {height: 0}
+    };
+
     const revalidator = useRevalidator()
     const ref = useRef(null)
     const Offset = styled('div')(({theme}) => theme.mixins.toolbar);

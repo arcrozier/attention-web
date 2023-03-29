@@ -62,6 +62,10 @@ export function useLogout(): (redirect?: boolean) => void {
     }
 }
 
+export function useAnimations(): boolean {
+    return !useMediaQuery('(prefers-reduced-motion: reduce)');
+}
+
 /**
  * Returns whether the device supports a native app
  *

@@ -1,6 +1,6 @@
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {Friend, notify, useProps} from "../App";
-import {SnackbarStatus, useLogout, useSnackBarStatus, useTitle} from "../Root";
+import {SnackbarStatus, useAnimations, useLogout, useSnackBarStatus, useTitle} from "../Root";
 import {AttentionAppBar} from "../utils/AttentionAppBar";
 import {
     Button,
@@ -9,7 +9,7 @@ import {
     DialogContent,
     DialogTitle,
     Divider,
-    IconButton,
+    IconButton, LinearProgress,
     TextField,
     Typography,
     useTheme
@@ -19,6 +19,7 @@ import {Close} from "@mui/icons-material";
 import {DEFAULT_DELAY, LIST_ELEMENT_PADDING, UPDATE_INTERVAL} from "../utils/defs";
 import {sendMessage} from "../utils/repository";
 import {AxiosError} from "axios";
+import {Transition, TransitionGroup} from "react-transition-group";
 
 const DEFAULT_PFP_SIZE = "40pt"
 
@@ -28,7 +29,6 @@ enum FriendCardState {
     EDIT,
     CANCEL
 }
-
 
 interface FriendCardProps {
     friend: Friend,
@@ -43,6 +43,8 @@ interface FriendCardProps {
 function FriendCard(props: FriendCardProps) {
     const {friend, delay, state, setState, setSnackBar} = props;
 
+    const overlayDuration = useAnimations() ? 100 : 0
+
     const logout = useLogout()
 
     const [sendingStatus, setSendingStatus] = useState<string | null>(null)
@@ -51,6 +53,19 @@ function FriendCard(props: FriendCardProps) {
     const style = {
         margin: `0 ${LIST_ELEMENT_PADDING} 0 ${LIST_ELEMENT_PADDING}`
     }
+
+    const defaultStyle = {
+        transition: `height ${overlayDuration}ms ease-in-out`,
+        height: 0,
+    }
+
+    const transitionStyles = {
+        entering: {size: 'auto', opacity: 1},
+        entered: {size: 'auto', opacity: 1},
+        exiting: {size: 0, opacity: 0},
+        exited: {size: 0, opacity: 0},
+        unmounted: {size: 0, opacity: 0}
+    };
 
     const [displayX, setDisplayX] = useState(0)
 
@@ -252,6 +267,8 @@ function FriendCard(props: FriendCardProps) {
         sendSubtitle = friend.last_message_status
     }
 
+    const ref = useRef(null)
+
     return (
         <div>
             <div style={{
@@ -318,8 +335,14 @@ function FriendCard(props: FriendCardProps) {
                     </Typography>
                     }
                 </div>
+                <TransitionGroup>
+                    <Transition nodeRef={ref} timeout={overlayDuration}>
+                        {state => (
+                            state !== 'exited' && state !== 'unmounted' && overlay !== null && overlay
+                        )}
+                    </Transition>
+                </TransitionGroup>
                 {/* TODO animate overlay with Transition */}
-                {overlay !== null && overlay}
                 <Dialog
                     onClose={() => setAddMessage(false)}
                     open={addMessage}>
