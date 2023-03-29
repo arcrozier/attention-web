@@ -43,7 +43,7 @@ interface FriendCardProps {
 function FriendCard(props: FriendCardProps) {
     const {friend, delay, state, setState, setSnackBar} = props;
 
-    const overlayDuration = useAnimations() ? 100 : 0
+    const overlayDuration = useAnimations() ? 1000 : 0
 
     const logout = useLogout()
 
@@ -55,16 +55,31 @@ function FriendCard(props: FriendCardProps) {
     }
 
     const defaultStyle = {
-        transition: `all ${overlayDuration}ms ease-in-out`,
-        height: 0,
+        transition: `transform ${overlayDuration}ms ease-in-out, opacity ${overlayDuration}ms ease-in-out`,
+        //transform: 'scale(1)',
+        top: 0
     }
 
     const transitionStyles = {
-        entering: {transform: 'scale(1)', opacity: 1},
-        entered: {transform: 'scale(1)', opacity: 1},
-        exiting: {transform: 'scale(0)', opacity: 0},
-        exited: {transform: 'scale(0)', opacity: 0},
-        unmounted: {transform: 'scale(0)', opacity: 0}
+        entering: {
+            //transform: 'scale(1)',
+            opacity: 1
+        },
+        entered: {
+            //transform: 'scale(1)',
+            opacity: 1
+        },
+        exiting: {
+            //transform: 'scale(0)',
+            opacity: 0
+        },
+        exited: {
+            //transform: 'scale(0)',
+            opacity: 0},
+        unmounted: {
+            //transform: 'scale(0)',
+            opacity: 0
+        }
     };
 
     const [displayX, setDisplayX] = useState(0)
@@ -88,6 +103,7 @@ function FriendCard(props: FriendCardProps) {
     let overlay: React.ReactElement | null
 
 
+    // Timer for cancel progress bar and message sending logic
     useEffect(() => {
         if (state === FriendCardState.CANCEL) {
             const interval = setInterval(() => {
@@ -107,6 +123,7 @@ function FriendCard(props: FriendCardProps) {
                             message: 'Successfully sent alert',
                             autoHideDuration: 600
                         })
+                        setSendingStatus("Sent")
                     }).catch((e) => {
                         setSendError(true)
                         setSendingStatus('Error')
@@ -173,9 +190,10 @@ function FriendCard(props: FriendCardProps) {
     const progressBG = props.darkMode ? theme.palette.primary.light : theme.palette.primary.dark
     const progressFG = props.darkMode ? theme.palette.primary.dark : theme.palette.primary.light
 
+    // Creates the overlay
     switch (props.state) {
         case FriendCardState.SEND:
-            overlay = <FloatingDiv parentWidth={width} positionX={displayX}>
+            overlay = <div>
                 <IconButton style={style} aria-label={"close"} onClick={(e) => {
                     e.preventDefault()
                     props.setState(FriendCardState.NORMAL)
@@ -198,10 +216,10 @@ function FriendCard(props: FriendCardProps) {
                 } variant={"outlined"}>
                     Edit message
                 </Button>
-            </FloatingDiv>
+            </div>
             break
         case FriendCardState.EDIT:
-            overlay = <FloatingDiv parentWidth={width} positionX={displayX}>
+            overlay = <div>
                 <IconButton style={style} aria-label={"close"} onClick={(e) => {
                     e.preventDefault()
                     props.setState(FriendCardState.NORMAL)
@@ -225,7 +243,7 @@ function FriendCard(props: FriendCardProps) {
                 } variant={"outlined"}>
                     Delete
                 </Button>
-            </FloatingDiv>
+            </div>
             break
         case FriendCardState.CANCEL:
             overlay = <div style={{
@@ -338,7 +356,9 @@ function FriendCard(props: FriendCardProps) {
                 <TransitionGroup>
                     <Transition nodeRef={ref} timeout={overlayDuration}>
                         {state => (
-                            state !== 'exited' && state !== 'unmounted' && overlay !== null && overlay
+                            state !== 'exited' && state !== 'unmounted' && overlay !== null && <FloatingDiv parentWidth={width} positionX={displayX} ref={ref} style={{...defaultStyle, ...transitionStyles[state]}}>
+                                {overlay}
+                            </FloatingDiv>
                         )}
                     </Transition>
                 </TransitionGroup>
