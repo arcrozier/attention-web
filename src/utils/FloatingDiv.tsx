@@ -4,22 +4,24 @@ export interface FloatingDivProps {
     parentWidth: number,
     positionX: number,
     children?: React.ReactNode | React.ReactNode[],
-    ref?: React.MutableRefObject<any>,
+    innerRef?: React.MutableRefObject<any>,
     style?: React.CSSProperties,
 }
 
 export function FloatingDiv(props: FloatingDivProps) {
+    // initial size needs to be greater than or equal to the eventual size, otherwise
+    // the calculation may scrunch the div too close to the right
     const [innerWidth, setInnerWidth] = useState(props.parentWidth)
 
     const ref = useCallback((node: HTMLDivElement) => {
         if (node !== null) {
             setInnerWidth(node.getBoundingClientRect().width);
+            if (props.innerRef != null) {
+                props.innerRef.current = node
+            }
         }
     }, []);
 
-    if (props.ref != null) {
-        props.ref.current = ref
-    }
 
     return (<div style={{
         ...props.style,

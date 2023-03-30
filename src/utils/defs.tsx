@@ -26,4 +26,3 @@ export interface TextFieldStatus {
 }
 
 export const DEFAULT_DELAY = 3.5
-export const UPDATE_INTERVAL = 100

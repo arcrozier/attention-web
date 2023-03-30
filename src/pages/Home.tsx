@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import {FloatingDiv} from "../utils/FloatingDiv";
 import {Close} from "@mui/icons-material";
-import {DEFAULT_DELAY, LIST_ELEMENT_PADDING, UPDATE_INTERVAL} from "../utils/defs";
+import {DEFAULT_DELAY, LIST_ELEMENT_PADDING} from "../utils/defs";
 import {sendMessage} from "../utils/repository";
 import {AxiosError} from "axios";
 import {Transition, TransitionGroup} from "react-transition-group";
@@ -56,30 +56,26 @@ function FriendCard(props: FriendCardProps) {
 
     const defaultStyle = {
         transition: `transform ${overlayDuration}ms ease-in-out, opacity ${overlayDuration}ms ease-in-out`,
-        //transform: 'scale(1)',
+        transform: 'scale(1)',
         top: 0
     }
 
+    const visible = {
+        transform: 'scale(1)',
+        opacity: 1
+    }
+
+    const invisible = {
+        transform: 'scale(0)',
+        opacity: 0
+    }
+
     const transitionStyles = {
-        entering: {
-            //transform: 'scale(1)',
-            opacity: 1
-        },
-        entered: {
-            //transform: 'scale(1)',
-            opacity: 1
-        },
-        exiting: {
-            //transform: 'scale(0)',
-            opacity: 0
-        },
-        exited: {
-            //transform: 'scale(0)',
-            opacity: 0},
-        unmounted: {
-            //transform: 'scale(0)',
-            opacity: 0
-        }
+        entering: visible,
+        entered: visible,
+        exiting: invisible,
+        exited: invisible,
+        unmounted: invisible
     };
 
     const [displayX, setDisplayX] = useState(0)
@@ -102,18 +98,20 @@ function FriendCard(props: FriendCardProps) {
     const [message, setMessage] = useState<string | null>(null)
     let overlay: React.ReactElement | null
 
+    const animate = useAnimations()
+    const UPDATE_INTERVAL = animate ? 0.1 : 0.5
 
     // Timer for cancel progress bar and message sending logic
     useEffect(() => {
         if (state === FriendCardState.CANCEL) {
             const interval = setInterval(() => {
                 setCancelProgress((prevState) => {
-                    if (prevState + UPDATE_INTERVAL <= delay * 1000) {
+                    if (prevState + UPDATE_INTERVAL <= delay) {
                         return prevState + UPDATE_INTERVAL
                     }
-                    return delay * 1000
+                    return delay
                 })
-                if (cancelProgress >= delay * 1000) {
+                if (cancelProgress >= delay) {
                     setState(FriendCardState.NORMAL)
                     setSendingStatus("Sending...")
                     setSendError(false)
@@ -178,7 +176,7 @@ function FriendCard(props: FriendCardProps) {
                         }
                     })
                 }
-            }, UPDATE_INTERVAL)
+            }, UPDATE_INTERVAL * 1000)
             return () => {
                 clearInterval(interval)
                 setCancelProgress(0)
@@ -264,7 +262,7 @@ function FriendCard(props: FriendCardProps) {
                     width: `${cancelProgress / (1000 * props.delay)}%`,
                     height: "100%",
                     borderRadius: "1rem",
-                    transition: `${UPDATE_INTERVAL / 1000}s linear`,
+                    transition: `${animate ? UPDATE_INTERVAL / 1000 : 0}s linear`,
                     backgroundColor: progressFG,
                     position: "absolute",
                     zIndex: 0
@@ -278,14 +276,25 @@ function FriendCard(props: FriendCardProps) {
             overlay = null
     }
 
+    const ref = useRef(null)
+
+    console.log(state)
+    console.log(overlay)
+    overlay = <Transition nodeRef={ref} timeout={overlayDuration}>
+            {state => (
+                // breaks if the state !== 'exited' condition is removed
+                state !== 'exited' && state !== 'unmounted' && overlay !== null && <FloatingDiv parentWidth={width} positionX={displayX} innerRef={ref} style={{...defaultStyle, ...transitionStyles[state]}}>
+                    {overlay}
+                </FloatingDiv>
+            )}
+        </Transition>
     let sendSubtitle
     if (sendingStatus !== null) {
         sendSubtitle = sendingStatus
     } else {
         sendSubtitle = friend.last_message_status
-    }
 
-    const ref = useRef(null)
+    }
 
     return (
         <div>
@@ -354,13 +363,7 @@ function FriendCard(props: FriendCardProps) {
                     }
                 </div>
                 <TransitionGroup>
-                    <Transition nodeRef={ref} timeout={overlayDuration}>
-                        {state => (
-                            state !== 'exited' && state !== 'unmounted' && overlay !== null && <FloatingDiv parentWidth={width} positionX={displayX} ref={ref} style={{...defaultStyle, ...transitionStyles[state]}}>
-                                {overlay}
-                            </FloatingDiv>
-                        )}
-                    </Transition>
+                    {overlay}
                 </TransitionGroup>
                 {/* TODO animate overlay with Transition */}
                 <Dialog
@@ -446,8 +449,6 @@ export function Home() {
     const {webApp, darkMode, userInfo} = useProps()
 
     const [, setSnackbar] = useSnackBarStatus()
-
-    console.log(userInfo)
 
     const tempDelay = +(window.localStorage.getItem("delay") ?? DEFAULT_DELAY)
     const delay = isNaN(tempDelay) ? DEFAULT_DELAY : tempDelay
