@@ -54,12 +54,6 @@ function FriendCard(props: FriendCardProps) {
         margin: `0 ${LIST_ELEMENT_PADDING} 0 ${LIST_ELEMENT_PADDING}`
     }
 
-    const defaultStyle = {
-        transition: `transform ${overlayDuration}ms ease-in-out, opacity ${overlayDuration}ms ease-in-out`,
-        transform: 'scale(1)',
-        top: 0
-    }
-
     const visible = {
         transform: 'scale(1)',
         opacity: 1
@@ -68,6 +62,12 @@ function FriendCard(props: FriendCardProps) {
     const invisible = {
         transform: 'scale(0)',
         opacity: 0
+    }
+
+    const defaultStyle = {
+        transition: `transform ${overlayDuration}ms ease-in-out, opacity ${overlayDuration}ms ease-in-out`,
+        ...invisible,
+        top: 0
     }
 
     const transitionStyles = {
@@ -280,14 +280,18 @@ function FriendCard(props: FriendCardProps) {
 
     console.log(state)
     console.log(overlay)
-    overlay = <Transition nodeRef={ref} timeout={overlayDuration}>
+    if (overlay !== null) {
+        overlay = <Transition nodeRef={ref} timeout={overlayDuration} appear={true} mountOnEnter={false} unmountOnExit={false}>
             {state => (
                 // breaks if the state !== 'exited' condition is removed
-                state !== 'exited' && state !== 'unmounted' && overlay !== null && <FloatingDiv parentWidth={width} positionX={displayX} innerRef={ref} style={{...defaultStyle, ...transitionStyles[state]}}>
-                    {overlay}
+                state !== 'exited' && state !== 'unmounted' &&
+                <FloatingDiv parentWidth={width} positionX={displayX} innerRef={ref}
+                             style={{...defaultStyle, ...transitionStyles[state]}}>
+                    <div>Hi 2</div>
                 </FloatingDiv>
             )}
         </Transition>
+    }
     let sendSubtitle
     if (sendingStatus !== null) {
         sendSubtitle = sendingStatus
