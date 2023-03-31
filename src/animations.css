@@ -1,0 +1,28 @@
+:root {
+    --overlay-duration: 100ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --overlay-duration: 0 !important;
+    }
+}
+
+.overlay-enter {
+    opacity: 0;
+    transform: scale(0);
+}
+.overlay-enter-active {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity var(--overlay-duration) ease-in-out, transform var(--overlay-duration) ease-in-out;
+}
+.overlay-exit {
+    opacity: 1;
+    transform: scale(1);
+}
+.overlay-exit-active {
+    opacity: 0;
+    transform: scale(0);
+    transition: opacity var(--overlay-duration) ease-in-out, transform var(--overlay-duration) ease-in-out;
+}

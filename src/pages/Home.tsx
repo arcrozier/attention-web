@@ -9,7 +9,7 @@ import {
     DialogContent,
     DialogTitle,
     Divider,
-    IconButton, LinearProgress,
+    IconButton,
     TextField,
     Typography,
     useTheme
@@ -19,7 +19,7 @@ import {Close} from "@mui/icons-material";
 import {DEFAULT_DELAY, LIST_ELEMENT_PADDING} from "../utils/defs";
 import {sendMessage} from "../utils/repository";
 import {AxiosError} from "axios";
-import {Transition, TransitionGroup} from "react-transition-group";
+import {CSSTransition, TransitionGroup} from "react-transition-group";
 
 const DEFAULT_PFP_SIZE = "40pt"
 
@@ -43,7 +43,7 @@ interface FriendCardProps {
 function FriendCard(props: FriendCardProps) {
     const {friend, delay, state, setState, setSnackBar} = props;
 
-    const overlayDuration = useAnimations() ? 1000 : 0
+    const overlayDuration = useAnimations() ? 100 : 0
 
     const logout = useLogout()
 
@@ -53,30 +53,6 @@ function FriendCard(props: FriendCardProps) {
     const style = {
         margin: `0 ${LIST_ELEMENT_PADDING} 0 ${LIST_ELEMENT_PADDING}`
     }
-
-    const visible = {
-        transform: 'scale(1)',
-        opacity: 1
-    }
-
-    const invisible = {
-        transform: 'scale(0)',
-        opacity: 0
-    }
-
-    const defaultStyle = {
-        transition: `transform ${overlayDuration}ms ease-in-out, opacity ${overlayDuration}ms ease-in-out`,
-        ...invisible,
-        top: 0
-    }
-
-    const transitionStyles = {
-        entering: visible,
-        entered: visible,
-        exiting: invisible,
-        exited: invisible,
-        unmounted: invisible
-    };
 
     const [displayX, setDisplayX] = useState(0)
 
@@ -182,16 +158,18 @@ function FriendCard(props: FriendCardProps) {
                 setCancelProgress(0)
             }
         }
-    }, [friend, delay, state, setState, setSnackBar, message, logout, cancelProgress])
+    }, [friend, delay, state, setState, setSnackBar, message, logout, cancelProgress, UPDATE_INTERVAL])
 
     const theme = useTheme()
     const progressBG = props.darkMode ? theme.palette.primary.light : theme.palette.primary.dark
     const progressFG = props.darkMode ? theme.palette.primary.dark : theme.palette.primary.light
 
+    const ref = useRef(null)
+
     // Creates the overlay
     switch (props.state) {
         case FriendCardState.SEND:
-            overlay = <div>
+            overlay = <CSSTransition nodeRef={ref} timeout={overlayDuration} classNames={'overlay'} key={Date.now() % (overlayDuration * 2)}><FloatingDiv parentWidth={width} positionX={displayX} innerRef={ref}>
                 <IconButton style={style} aria-label={"close"} onClick={(e) => {
                     e.preventDefault()
                     props.setState(FriendCardState.NORMAL)
@@ -214,10 +192,12 @@ function FriendCard(props: FriendCardProps) {
                 } variant={"outlined"}>
                     Edit message
                 </Button>
-            </div>
+            </FloatingDiv>
+            </CSSTransition>
             break
         case FriendCardState.EDIT:
-            overlay = <div>
+            overlay = <CSSTransition nodeRef={ref} timeout={overlayDuration} classNames={'overlay'} key={Date.now() % (overlayDuration * 2)}>
+                <FloatingDiv parentWidth={width} positionX={displayX} innerRef={ref}>
                 <IconButton style={style} aria-label={"close"} onClick={(e) => {
                     e.preventDefault()
                     props.setState(FriendCardState.NORMAL)
@@ -241,10 +221,12 @@ function FriendCard(props: FriendCardProps) {
                 } variant={"outlined"}>
                     Delete
                 </Button>
-            </div>
+            </FloatingDiv>
+            </CSSTransition>
             break
         case FriendCardState.CANCEL:
-            overlay = <div style={{
+            overlay = <CSSTransition nodeRef={ref} timeout={overlayDuration} classNames={'overlay'} key={Date.now() % (overlayDuration * 2)}>
+                <div style={{
                 width: "100%",
                 height: "100%",
                 position: "absolute",
@@ -271,27 +253,19 @@ function FriendCard(props: FriendCardProps) {
                     Cancel
                 </div>
             </div>
+            </CSSTransition>
             break
         default:
             overlay = null
     }
-
-    const ref = useRef(null)
-
-    console.log(state)
-    console.log(overlay)
-    if (overlay !== null) {
-        overlay = <Transition nodeRef={ref} timeout={overlayDuration} appear={true} mountOnEnter={false} unmountOnExit={false}>
-            {state => (
-                // breaks if the state !== 'exited' condition is removed
-                state !== 'exited' && state !== 'unmounted' &&
-                <FloatingDiv parentWidth={width} positionX={displayX} innerRef={ref}
-                             style={{...defaultStyle, ...transitionStyles[state]}}>
-                    <div>Hi 2</div>
-                </FloatingDiv>
-            )}
-        </Transition>
-    }
+    //
+    // if (overlay !== null) {
+    //     overlay = <CSSTransition nodeRef={ref} timeout={overlayDuration} classNames={'overlay'} key={Date.now() % (overlayDuration * 2)}>
+    //         <FloatingDiv parentWidth={width} positionX={displayX} innerRef={ref}>
+    //             -------------- TEST ---------------
+    //         </FloatingDiv>
+    //     </CSSTransition>
+    // }
     let sendSubtitle
     if (sendingStatus !== null) {
         sendSubtitle = sendingStatus
@@ -312,7 +286,6 @@ function FriendCard(props: FriendCardProps) {
                 position: "relative"
             }} ref={outerRef} onClick={(e) => {
                 e.preventDefault()
-                console.log(e.nativeEvent)
                 setDisplayX(e.clientX - e.currentTarget.getBoundingClientRect().left)
                 switch (props.state) {
                     case FriendCardState.NORMAL:
@@ -327,11 +300,13 @@ function FriendCard(props: FriendCardProps) {
             }
             } onContextMenu={(e) => {
                 e.preventDefault()
-                setDisplayX(e.nativeEvent.offsetX)
+                setDisplayX(e.clientX - e.currentTarget.getBoundingClientRect().left)
                 switch (props.state) {
                     case FriendCardState.NORMAL:
-                    case FriendCardState.SEND:
                         props.setState(FriendCardState.EDIT)
+                        break
+                    case FriendCardState.SEND:
+                        props.setState(FriendCardState.NORMAL)
                         break
                 }
             }
@@ -366,7 +341,7 @@ function FriendCard(props: FriendCardProps) {
                     </Typography>
                     }
                 </div>
-                <TransitionGroup>
+                <TransitionGroup component={null}>
                     {overlay}
                 </TransitionGroup>
                 {/* TODO animate overlay with Transition */}
