@@ -20,9 +20,10 @@ export function FloatingDiv(props: FloatingDivProps) {
                 props.innerRef.current = node
             }
         }
-    }, []);
+    }, [props.innerRef]);
 
 
+    console.log(innerWidth, props.parentWidth, props.positionX)
     return (<div style={{
         ...props.style,
         position: "absolute",

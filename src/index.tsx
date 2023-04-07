@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+import './animations.css';
 import App, {userInfoLoader as rootLoader} from './App';
 import {AuthRoot, CreateAccount, Login} from './pages/Login'
 import reportWebVitals from './reportWebVitals';
