@@ -9,8 +9,7 @@ import {
     DialogContent,
     DialogTitle,
     Divider,
-    IconButton, LinearProgress,
-    TextField,
+    IconButton, TextField,
     Typography,
     useTheme
 } from "@mui/material";
@@ -20,6 +19,18 @@ import {DEFAULT_DELAY, LIST_ELEMENT_PADDING} from "../utils/defs";
 import {sendMessage} from "../utils/repository";
 import {AxiosError} from "axios";
 import {Transition, TransitionGroup} from "react-transition-group";
+import { initializeApp } from 'firebase/app';
+
+const firebaseConfig = {
+    apiKey: "AIzaSyA5ljTAlRg0h45nWMSGeMwibmIp-NW1M3Y",
+    authDomain: "attention-b923d.firebaseapp.com",
+    projectId: "attention-b923d",
+    databaseURL: "https://attention-b923d.firebaseio.com",
+    messagingSenderId: "357995852275",
+    appId: "1:357995852275:android:81433d8dcdd982cf5f2286",
+};
+
+const app = initializeApp(firebaseConfig);
 
 const DEFAULT_PFP_SIZE = "40pt"
 

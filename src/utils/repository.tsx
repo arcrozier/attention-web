@@ -60,3 +60,10 @@ export async function sendMessage(to: string, message: string | null = null) {
     })
 
 }
+
+export async function registerDevice(fcmToken: string) {
+    await requireCSRF()
+    return axios.post(`${BASE_URL}register_device/`, {
+        fcm_token: fcmToken
+    })
+}
