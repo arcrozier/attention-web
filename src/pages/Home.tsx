@@ -270,14 +270,7 @@ function FriendCard(props: FriendCardProps) {
         default:
             overlay = null
     }
-    //
-    // if (overlay !== null) {
-    //     overlay = <CSSTransition nodeRef={ref} timeout={overlayDuration} classNames={'overlay'} key={Date.now() % (overlayDuration * 2)}>
-    //         <FloatingDiv parentWidth={width} positionX={displayX} innerRef={ref}>
-    //             -------------- TEST ---------------
-    //         </FloatingDiv>
-    //     </CSSTransition>
-    // }
+
     let sendSubtitle
     if (sendingStatus !== null) {
         sendSubtitle = sendingStatus
@@ -356,7 +349,6 @@ function FriendCard(props: FriendCardProps) {
                 <TransitionGroup component={null}>
                     {overlay}
                 </TransitionGroup>
-                {/* TODO animate overlay with Transition */}
                 <Dialog
                     onClose={() => setAddMessage(false)}
                     open={addMessage}>
