@@ -17,21 +17,39 @@ import {
 import {FloatingDiv} from "../utils/FloatingDiv";
 import {Close} from "@mui/icons-material";
 import {DEFAULT_DELAY, LIST_ELEMENT_PADDING} from "../utils/defs";
-import {sendMessage} from "../utils/repository";
+import {registerDevice, sendMessage} from "../utils/repository";
 import {AxiosError} from "axios";
 import {CSSTransition, TransitionGroup} from "react-transition-group";
 import { initializeApp } from 'firebase/app';
+import { getMessaging,getToken } from "firebase/messaging";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyA5ljTAlRg0h45nWMSGeMwibmIp-NW1M3Y",
+    apiKey: "AIzaSyC8UHmnpf_yo2tXMBHk-897lL-VnX8pVTk",
     authDomain: "attention-b923d.firebaseapp.com",
-    projectId: "attention-b923d",
     databaseURL: "https://attention-b923d.firebaseio.com",
+    projectId: "attention-b923d",
+    storageBucket: "attention-b923d.appspot.com",
     messagingSenderId: "357995852275",
-    appId: "1:357995852275:android:81433d8dcdd982cf5f2286",
+    appId: "1:357995852275:web:9c144fd2517203d05f2286",
+    measurementId: "G-HKFYEMRZ9S"
 };
 
 const app = initializeApp(firebaseConfig);
+const messaging = getMessaging(app);
+getToken(messaging, {vapidKey: "BD_lSto79pwcXtKhH2BCtvf_KMpm3ut6C1ifTIozgLH054fJigE33tR-fqLHRCm13Oms1BYW9coUpqR3Ca5olxk"}).then((currentToken) => {
+    if (currentToken) {
+        registerDevice(currentToken).then(() => {
+            console.log("registered device!")
+        })
+    } else {
+        // Show permission request UI
+        console.log('No registration token available. Request permission to generate one.');
+        // ...
+    }
+}).catch((err) => {
+    console.log('An error occurred while retrieving token. ', err);
+    // ...
+})
 
 const DEFAULT_PFP_SIZE = "40pt"
 
