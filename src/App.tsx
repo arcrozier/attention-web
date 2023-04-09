@@ -5,9 +5,87 @@ import {
     useLoaderData,
     useOutletContext
 } from "react-router-dom";
-import {APIResult, getUserInfo} from "./utils/repository";
+import {APIResult, getUserInfo, registerDevice} from "./utils/repository";
 import {Properties, useProps as useRootProps} from "./Root";
 import {AxiosResponse} from "axios";
+import { initializeApp } from 'firebase/app';
+import { getMessaging,getToken } from "firebase/messaging";
+
+const key = "BD_lSto79pwcXtKhH2BCtvf_KMpm3ut6C1ifTIozgLH054fJigE33tR-fqLHRCm13Oms1BYW9coUpqR3Ca5olxk"
+
+const firebaseConfig = {
+    apiKey: "AIzaSyC8UHmnpf_yo2tXMBHk-897lL-VnX8pVTk",
+    authDomain: "attention-b923d.firebaseapp.com",
+    databaseURL: "https://attention-b923d.firebaseio.com",
+    projectId: "attention-b923d",
+    storageBucket: "attention-b923d.appspot.com",
+    messagingSenderId: "357995852275",
+    appId: "1:357995852275:web:9c144fd2517203d05f2286",
+    measurementId: "G-HKFYEMRZ9S"
+};
+
+const app = initializeApp(firebaseConfig);
+const messaging = getMessaging(app);
+
+const getNotificationPermission = (onGranted?: () => void, onDenied?: () => void): boolean => {
+    if (!("Notification" in window)) {
+        return false
+    } else if (Notification.permission === "granted") {
+        // Check whether notification permissions have already been granted;
+        // if so, create a notification
+        if (onGranted) {
+            onGranted()
+        }
+        return true
+    } else if (Notification.permission !== "denied") {
+        // We need to ask the user for permission
+        Notification.requestPermission().then((permission) => {
+            // If the user accepts, let's create a notification
+            if (permission === "granted") {
+                if (onGranted) {
+                    onGranted()
+                }
+            } else {
+                if (onDenied) {
+                    onDenied()
+                }
+            }
+        });
+    } else {
+        if (onDenied) {
+            onDenied()
+        }
+    }
+    return false
+}
+
+getToken(messaging, {vapidKey: key}).then((currentToken) => {
+    if (currentToken) {
+        registerDevice(currentToken).then(() => {
+            console.log("registered device!")
+        })
+    } else {
+        // Show permission request UI
+        console.log('No registration token available. Request permission to generate one.');
+        getNotificationPermission(() => {
+            getToken(messaging, {vapidKey: key}).then((currentToken) => {
+                if (currentToken) {
+                    registerDevice(currentToken).then(() => {
+                        console.log("registered device!")
+                    })
+                } else {
+                    console.log('Unable to get registration token.');
+                }
+            }).catch((err) => {
+                console.log('An error occurred while retrieving token. ', err);
+                // ...
+            })
+        })
+    }
+}).catch((err) => {
+    console.log('An error occurred while retrieving token. ', err);
+    // ...
+})
 
 const ICON_URL = process.env.PUBLIC_URL + '/icon.svg'
 
@@ -55,35 +133,10 @@ export function useProps() {
 export function notify(title: string, options: NotificationOptions | undefined = undefined, onclick: ((this: Notification, ev: Event) => any) | null = null): boolean {
     // set defaults
     options = {...{badge: ICON_URL, icon: ICON_URL, renotify: true}, ...options}
-    if (!("Notification" in window)) {
-        return false
-    } else if (Notification.permission === "granted") {
-        // Check whether notification permissions have already been granted;
-        // if so, create a notification
+    return getNotificationPermission(() => {
         const notification = new Notification(title, options)
         notification.onclick = onclick
-        return true
-    } else if (Notification.permission !== "denied") {
-        // We need to ask the user for permission
-        Notification.requestPermission().then((permission) => {
-            // If the user accepts, let's create a notification
-            if (permission === "granted") {
-                const notification = new Notification(title, options);
-                notification.onclick = onclick
-            }
-        });
-    }
-    return false
-}
-
-function requestNotificationPermission() {
-    if (!("Notification" in window)) {
-        // Check if the browser supports notifications
-        return
-    } else if (Notification.permission !== "denied" && Notification.permission !== "granted") {
-        // We need to ask the user for permission
-        Notification.requestPermission().then()
-    }
+    })
 }
 
 function App() {
@@ -100,7 +153,7 @@ function App() {
 
     useEffect(() => {
         if (userInfo !== null) {
-            requestNotificationPermission()
+            getNotificationPermission()
         }
     }, [userInfo])
 
