@@ -78,13 +78,11 @@ getToken(messaging, {vapidKey: key}).then((currentToken) => {
                 }
             }).catch((err) => {
                 console.log('An error occurred while retrieving token. ', err);
-                // ...
             })
         })
     }
 }).catch((err) => {
     console.log('An error occurred while retrieving token. ', err);
-    // ...
 })
 
 const ICON_URL = process.env.PUBLIC_URL + '/icon.svg'
