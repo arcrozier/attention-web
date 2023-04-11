@@ -15,6 +15,24 @@
       name="description"
       content="The web application for Attention"
     />
+
+    <style>
+      body {
+        margin: 0;
+      }
+
+      #root:empty {
+        min-height: 100vh;
+        background-color: #ffffff;
+        margin: 0;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        #root:empty {
+          background-color: #121212 !important;
+        }
+      }
+    </style>
     <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
@@ -43,5 +61,6 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+  <!-- TODO finish adding splash image -->
   </body>
 </html>

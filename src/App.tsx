@@ -1,6 +1,7 @@
 import React, {useEffect} from 'react';
 import './App.css';
 import {
+    defer,
     Outlet,
     useLoaderData,
     useOutletContext
@@ -91,7 +92,7 @@ const ICON_URL = process.env.PUBLIC_URL + '/icon.svg'
 // offline support - support cached friends? No
 
 export interface AppProperties extends Properties {
-    userInfo: UserInfo | null
+    userInfo: Promise<AxiosResponse<APIResult<UserInfo>>> | null
 }
 
 export enum MESSAGE_STATUS {
@@ -121,7 +122,7 @@ export interface UserInfo {
 }
 
 export async function userInfoLoader() {
-    return await getUserInfo()
+    return defer({userInfo: getUserInfo()})
 }
 
 export function useProps() {
@@ -139,14 +140,14 @@ export function notify(title: string, options: NotificationOptions | undefined =
 
 function App() {
 
-    const userInfo = useLoaderData() as AxiosResponse<APIResult<UserInfo>>
+    const userInfo = useLoaderData() as {userInfo: Promise<AxiosResponse<APIResult<UserInfo>>>}
 
     const {darkMode, webApp} = useRootProps()
 
     const props: AppProperties = {
         darkMode: darkMode,
         webApp: webApp,
-        userInfo: userInfo.data.data
+        userInfo: userInfo.userInfo
     }
 
     useEffect(() => {
@@ -154,8 +155,6 @@ function App() {
             getNotificationPermission()
         }
     }, [userInfo])
-
-    // TODO on launch, try to register the device
 
     return (
         <div className="App">

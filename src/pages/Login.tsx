@@ -141,6 +141,7 @@ export function Login() {
 
             <Typography variant={"h3"}>Login</Typography>
             <div style={{height: LIST_ELEMENT_PADDING}}/>
+            <form>
             <div className={"textfield-width"}>
                 <TextField autoComplete={"username"} variant={"outlined"}
                            error={passwordStatus.error} label={"Username"}
@@ -179,6 +180,7 @@ export function Login() {
             <div style={{height: LIST_ELEMENT_PADDING}}/>
             <LoadingButton variant={"contained"} loading={loading} onClick={doLogin}>Log
                 in</LoadingButton>
+            </form>
 
             <div style={{height: LIST_ELEMENT_PADDING}}/>
             <Divider className={"textfield-width"}/>

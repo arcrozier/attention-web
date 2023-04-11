@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useRef, useState} from "react";
-import {Friend, notify, useProps} from "../App";
+import {Friend, notify, useProps, UserInfo} from "../App";
 import {SnackbarStatus, useAnimations, useLogout, useSnackBarStatus, useTitle} from "../Root";
 import {AttentionAppBar} from "../utils/AttentionAppBar";
 import {
@@ -17,9 +17,10 @@ import {
 import {FloatingDiv} from "../utils/FloatingDiv";
 import {Close} from "@mui/icons-material";
 import {DEFAULT_DELAY, LIST_ELEMENT_PADDING} from "../utils/defs";
-import {registerDevice, sendMessage} from "../utils/repository";
-import {AxiosError} from "axios";
+import {APIResult, sendMessage} from "../utils/repository";
+import {AxiosError, AxiosResponse} from "axios";
 import {CSSTransition, TransitionGroup} from "react-transition-group";
+import {Await} from "react-router-dom"
 
 const DEFAULT_PFP_SIZE = "40pt"
 
@@ -428,29 +429,40 @@ export function Home() {
 
     const [cardState, setCardState] = useState(new Map())
 
-    const friends = userInfo == null ? [] : userInfo.friends.map((value) =>
-        <li key={value.friend} style={{listStyle: "none"}}>
-            <FriendCard friend={value}
-                        delay={delay}
-                        darkMode={darkMode}
-                        state={cardState.has(value.friend) ? cardState.get(value.friend) : FriendCardState.NORMAL}
-                        setState={(state) => {
-                            setCardState((val) => {
-                                const clone = new Map(val);
-                                clone.set(value.friend, state)
-                                return clone
-                            })
-                        }}
-                        setSnackBar={setSnackbar}/>
-        </li>
-    )
+    const friends = (userInfo: UserInfo | null): JSX.Element[] => {
+        return userInfo == null ? [] : userInfo.friends.map((value) =>
+            <li key={value.friend} style={{listStyle: "none"}}>
+                <FriendCard friend={value}
+                            delay={delay}
+                            darkMode={darkMode}
+                            state={cardState.has(value.friend) ? cardState.get(value.friend) : FriendCardState.NORMAL}
+                            setState={(state) => {
+                                setCardState((val) => {
+                                    const clone = new Map(val);
+                                    clone.set(value.friend, state)
+                                    return clone
+                                })
+                            }}
+                            setSnackBar={setSnackbar}/>
+            </li>
+        )
+    }
 
     return (
         <div className="App">
             <AttentionAppBar title={"Attention!"} back={null} settings={true}/>
-            <ul style={{padding: 0, margin: 0}}>
-                {friends}
-            </ul>
+
+            {/* TODO better loading (can we get the loading bar?) and error handling */}
+            <React.Suspense fallback={<p>Loading</p>}>
+                <Await resolve={userInfo} errorElement={<p>Error!</p>}>
+                    {(userInfo: Awaited<AxiosResponse<APIResult<UserInfo>>>) => (
+                        <ul style={{padding: 0, margin: 0}}>
+                            {
+                                friends(userInfo.data.data)}
+                        </ul>
+                    )}
+                </Await>
+            </React.Suspense>
         </div>
     );
 }

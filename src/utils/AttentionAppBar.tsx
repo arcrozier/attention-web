@@ -75,7 +75,7 @@ export function AttentionAppBar(props: AppBarProps) {
                             <div>
                                 <IconButton size={"large"} aria-label={"refresh"} onClick={() => {
                                     revalidator.revalidate()
-                                }}>
+                                }} color="inherit">
                                     <Refresh/>
                                 </IconButton>
                                 {props.settings && <IconButton
