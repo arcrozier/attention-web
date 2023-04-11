@@ -60,6 +60,7 @@ const router = createBrowserRouter([
 
 ]);
 
+// https://ui.dev/react-router-code-splitting
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <React.StrictMode>
         <RouterProvider router={router} />
