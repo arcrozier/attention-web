@@ -1,20 +1,23 @@
-import React from 'react';
+import React, {Suspense} from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import './animations.css';
 import App, {userInfoLoader as rootLoader} from './App';
-import {AuthRoot, CreateAccount, Login} from './pages/Login'
 import reportWebVitals from './reportWebVitals';
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import ErrorPage from "./pages/ErrorPage";
-import Home from "./pages/Home";
-import Settings from "./pages/Settings";
-import Root from "./Root";
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+
+const AuthRoot = React.lazy(() => import('./pages/Login').then((c) => ({default: c.AuthRoot})))
+const Login = React.lazy(() => import('./pages/Login').then((c) => ({default: c.Login})))
+const CreateAccount = React.lazy(() => import('./pages/Login').then((c) => ({default: c.CreateAccount})))
+const Root = React.lazy(() => import('./Root'))
+const Settings = React.lazy(() => import('./pages/Settings'))
+const Home = React.lazy(() => import('./pages/Home'))
 
 const router = createBrowserRouter([
     {
@@ -63,7 +66,9 @@ const router = createBrowserRouter([
 // https://ui.dev/react-router-code-splitting
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <React.StrictMode>
-        <RouterProvider router={router} />
+        <Suspense fallback={null}>
+            <RouterProvider router={router} />
+        </Suspense>
     </React.StrictMode>
 );
 
