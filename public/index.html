@@ -15,68 +15,6 @@
       name="description"
       content="The web application for Attention"
     />
-
-    <style>
-      body {
-        margin: 0;
-      }
-
-      #root:before {
-        background-image: url("%PUBLIC_URL%/icon.svg");
-        background-color: unset;
-        background-repeat: no-repeat;
-        background-size: 25%;
-        background-position: center;
-        opacity: 0;
-        width: 100%;
-        height: 100%;
-        content: ' ';
-        display: block;
-        position: absolute;
-        left: 0;
-        top: 0;
-      }
-
-      /* todo doesn't work on slow connections */
-      #root:not(:empty):before {
-        animation: 0.5s fade-in both reverse ease-in;
-      }
-
-      #root:empty {
-        background-color: #ffffff;
-        min-height: 100vh;
-        margin: 0;
-      }
-
-      #root:empty:before {
-        animation: 2s fade-in both ease-in-out, 2s loading 2s alternate infinite ease-in-out
-        forwards;
-      }
-
-      @keyframes fade-in {
-        0% {
-          opacity: 0;
-        }
-        100% {
-          opacity: 1;
-        }
-      }
-
-      @keyframes loading {
-        0% {
-          opacity: 1;
-        }
-        100% {
-          opacity: 0.6;
-        }
-      }
-
-      @media (prefers-color-scheme: dark) {
-        #root:empty {
-          background-color: #121212 !important;
-        }
-      }
-    </style>
     <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
@@ -90,6 +28,68 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
+
+    <style>
+      #splash-img {
+        opacity: 0;
+      }
+    </style>
+
+    <script>
+      let img;
+      function splash() {
+        const body = document.getElementsByTagName("body")[0]
+        img = document.createElement("img")
+        img.id = 'splash-img'
+
+        body.appendChild(img)
+        const appearAnimation = [
+          {transform: "opacity: 0"},
+          {transform: "opacity: 1"}
+        ]
+
+        const loadingAnimation = [
+          {transform: "opacity: 1"},
+          {transform: "opacity: 0.6"}
+        ]
+        img.onload = () => {
+          img.animate(appearAnimation, 2).onfinish(() => {
+            img.animate(loadingAnimation, {
+              direction: "alternate",
+              duration: 2,
+              easing: "ease-in-out",
+              iterations: Infinity
+            })
+          })
+        }
+      }
+
+      if (document.readyState === "loading") {
+        // Loading hasn't finished yet
+        document.addEventListener("DOMContentLoaded", splash);
+      } else if (document.readyState !== "complete") {
+        // `DOMContentLoaded` has already fired
+        splash();
+      }
+
+      if (document.readyState !== "complete") {
+        document.addEventListener("load", () => {
+          if (img) {
+            const disappearAnimation = [
+              {transform: "opacity: 0"}
+            ]
+            img.animate(disappearAnimation, {
+              direction: "normal",
+              duration: 10,
+              easing: "ease-in",
+              fill: "forwards"
+            }).onfinish(() => {
+              img.remove()
+            })
+          }
+        })
+      }
+    </script>
     <title>Attention!</title>
   </head>
   <body>
