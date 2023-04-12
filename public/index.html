@@ -34,13 +34,24 @@
         margin: 0;
       }
 
-      #splash-img {
-        opacity: 0;
+      #splash-wrapper {
+        display: flex;
         height: 100%;
         width: 100%;
         position: absolute;
         top: 0;
         left: 0;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #splash-img {
+        opacity: 0;
+        height: 100%;
+        max-width: 10%;
+        max-height: 10%;
+        background-color: #ffffff;
+        z-index: 10;
       }
 
       #root:empty {
@@ -53,6 +64,10 @@
         #root:empty {
           background-color: #121212 !important;
         }
+
+        #splash-img {
+          background-color: #121212 !important;
+        }
       }
     </style>
 
@@ -63,16 +78,14 @@
       let loopingAnimation;
 
       function splash() {
-        console.log("splash")
-        const body = document.getElementsByTagName("body")[0]
-        img = document.createElement("img")
-        img.id = 'splash-img'
-        img.fetchpriority = 'high'
+        img = document.getElementById('splash-img')
+        img.classList.remove('loading')
+        if (!img) {
+          return
+        }
 
-        body.appendChild(img)
         console.log("image appended")
         const appearKeyframes = [
-          {opacity: "0"},
           {opacity: "1"}
         ]
 
@@ -80,8 +93,8 @@
           {opacity: "1"},
           {opacity: "0.6"}
         ]
-        img.onload = () => {
-          console.log("loaded")
+
+        const whenLoaded = () => {
           loadingAnimation = img.animate(appearKeyframes, 2000)
           loadingAnimation.onfinish = () => {
             loopingAnimation = img.animate(loadingKeyframes, {
@@ -92,26 +105,40 @@
             })
           }
         }
-        img.src = '%PUBLIC_URL%/icon.svg'
-        console.log("src set")
+        if (img.complete) {
+          whenLoaded()
+        } else {
+          img.onload = () => {
+            whenLoaded()
+          }
+        }
       }
 
       if (document.readyState === "loading") {
         // Loading hasn't finished yet
         document.addEventListener("DOMContentLoaded", () => {
-          console.log("domcontentloaded")
           splash()
         });
       } else if (document.readyState !== "complete") {
         // `DOMContentLoaded` has already fired
-        console.log("domcontentloaded already")
         splash();
       }
 
       if (document.readyState !== "complete") {
         window.addEventListener("load", () => {
-          console.log("complete")
-          if (img) {
+          const wrapper = document.getElementById('splash-wrapper')
+          // img -> wrapper
+          console.assert(!img || wrapper)
+          if (!wrapper) {
+            // img is gone
+            img = null
+          } else if (!img) {
+            // wrapper is not null
+            // the in-animation hasn't played
+            wrapper.remove()
+            // element removed
+          } else {
+            // img != null && wrapper != null
             if (loadingAnimation && loadingAnimation.playState === 'running') {
               loadingAnimation.pause()
             }
@@ -123,7 +150,7 @@
             ]
             const disappearAnimation = img.animate(disappearKeyframes, {
               direction: "normal",
-              duration: 2000,
+              duration: 500,
               easing: "ease-in",
               fill: "forwards"
             })
@@ -134,10 +161,7 @@
           }
         })
       } else {
-        console.log("already complete")
-        if (img) {
-          img.remove()
-        }
+        document.getElementById('splash-wrapper').remove()
       }
     </script>
     <title>Attention!</title>
@@ -145,6 +169,10 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <div id="splash-wrapper">
+      <img id="splash-img" class="loading" src="%PUBLIC_URL%/icon.svg" alt="Application loading"
+           fetchpriority="high" />
+    </div>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
