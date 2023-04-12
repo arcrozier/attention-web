@@ -21,10 +21,49 @@
         margin: 0;
       }
 
+      #root:before {
+        background-image: url("%PUBLIC_URL%/icon.svg");
+        background-color: unset;
+        background-repeat: no-repeat;
+        background-size: 25%;
+        background-position: center;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        content: ' ';
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 0;
+        transition: opacity 2s;
+      }
+
       #root:empty {
+        background-color: #ffffff;
         min-height: 100vh;
         margin: 0;
-        background: url("%PUBLIC_URL%/icon.svg") no-repeat center/25% #ffffff;
+      }
+
+      #root:empty:before {
+        animation: 2s fade-in both ease-in-out, 2s loading 2s alternate infinite ease-in-out;
+      }
+
+      @keyframes fade-in {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      @keyframes loading {
+        0% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0.75;
+        }
       }
 
       @media (prefers-color-scheme: dark) {
