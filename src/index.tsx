@@ -19,6 +19,7 @@ const Root = React.lazy(() => import('./Root'))
 const Settings = React.lazy(() => import('./pages/Settings'))
 const Home = React.lazy(() => import('./pages/Home'))
 
+// TODO more granular Suspense elements
 const router = createBrowserRouter([
     {
         path: "/",

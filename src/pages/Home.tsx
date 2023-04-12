@@ -270,6 +270,7 @@ function FriendCard(props: FriendCardProps) {
 
     return (
         <div>
+            {/* TODO apply blur/opacity effect and animation if overlay is displayed */}
             <div style={{
                 width: "100%",
                 height: "48pt",

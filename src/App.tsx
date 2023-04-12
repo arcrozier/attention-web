@@ -88,9 +88,6 @@ getToken(messaging, {vapidKey: key}).then((currentToken) => {
 
 const ICON_URL = process.env.PUBLIC_URL + '/icon.svg'
 
-// TODO https://create-react-app.dev/docs/making-a-progressive-web-app/
-// offline support - support cached friends? No
-
 export interface AppProperties extends Properties {
     userInfo: Promise<AxiosResponse<APIResult<UserInfo>>> | null
 }
