@@ -66,7 +66,7 @@ const router = createBrowserRouter([
 // https://ui.dev/react-router-code-splitting
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <React.StrictMode>
-        <Suspense fallback={<p>Loading...</p>}>
+        <Suspense fallback={null}>
             <RouterProvider router={router} />
         </Suspense>
     </React.StrictMode>

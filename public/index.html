@@ -35,7 +35,11 @@
         position: absolute;
         left: 0;
         top: 0;
-        transition: opacity 2s;
+      }
+
+      /* todo doesn't work on slow connections */
+      #root:not(:empty):before {
+        animation: 0.5s fade-in both reverse ease-in;
       }
 
       #root:empty {
@@ -45,7 +49,8 @@
       }
 
       #root:empty:before {
-        animation: 2s fade-in both ease-in-out, 2s loading 2s alternate infinite ease-in-out;
+        animation: 2s fade-in both ease-in-out, 2s loading 2s alternate infinite ease-in-out
+        forwards;
       }
 
       @keyframes fade-in {
@@ -62,7 +67,7 @@
           opacity: 1;
         }
         100% {
-          opacity: 0.75;
+          opacity: 0.6;
         }
       }
 
