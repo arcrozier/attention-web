@@ -1,16 +1,11 @@
 import React, {useEffect} from 'react';
 import './App.css';
-import {
-    defer,
-    Outlet,
-    useLoaderData,
-    useOutletContext
-} from "react-router-dom";
+import {defer, Outlet, useLoaderData, useOutletContext} from "react-router-dom";
 import {APIResult, getUserInfo, registerDevice} from "./utils/repository";
 import {Properties, useProps as useRootProps} from "./Root";
-import {AxiosResponse} from "axios";
-import { initializeApp } from 'firebase/app';
-import { getMessaging,getToken } from "firebase/messaging";
+import {AxiosError, AxiosResponse} from "axios";
+import {initializeApp} from 'firebase/app';
+import {getMessaging, getToken} from "firebase/messaging";
 
 const key = "BD_lSto79pwcXtKhH2BCtvf_KMpm3ut6C1ifTIozgLH054fJigE33tR-fqLHRCm13Oms1BYW9coUpqR3Ca5olxk"
 
@@ -64,6 +59,12 @@ getToken(messaging, {vapidKey: key}).then((currentToken) => {
     if (currentToken) {
         registerDevice(currentToken).then(() => {
             console.log("registered device!")
+        }).catch((error: AxiosError) => {
+            if (error.response && error.response.status === 403) {
+                console.log("device already registered")
+            } else {
+                console.log(error)
+            }
         })
     } else {
         // Show permission request UI
@@ -137,7 +138,7 @@ export function notify(title: string, options: NotificationOptions | undefined =
 
 function App() {
 
-    const userInfo = useLoaderData() as {userInfo: Promise<AxiosResponse<APIResult<UserInfo>>>}
+    const userInfo = useLoaderData() as { userInfo: Promise<AxiosResponse<APIResult<UserInfo>>> }
 
     const {darkMode, webApp} = useRootProps()
 
