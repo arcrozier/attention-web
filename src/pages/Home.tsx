@@ -423,6 +423,8 @@ export function Home() {
 
     const [, setSnackbar] = useSnackBarStatus()
 
+    const [loading, setLoading] = useState(true)
+
     const tempDelay = +(window.localStorage.getItem("delay") ?? DEFAULT_DELAY)
     const delay = isNaN(tempDelay) ? DEFAULT_DELAY : tempDelay
 
@@ -449,9 +451,17 @@ export function Home() {
         )
     }
 
+    userInfo?.then(() => {
+        setLoading(false)
+    })
+
     return (
         <div className="App">
-            <AttentionAppBar title={"Attention!"} back={null} settings={true}/>
+            <AttentionAppBar title={"Attention!"} back={null} settings={true} loading={loading} setLoading={(l) => {
+                setLoading((prevState) => {
+                    return prevState || l
+                })
+            }}/>
 
             {/* TODO better loading (can we get the loading bar?) and error handling */}
             <React.Suspense fallback={<p>Loading</p>}>

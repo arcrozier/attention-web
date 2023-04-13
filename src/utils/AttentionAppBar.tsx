@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import {Link, useRevalidator} from "react-router-dom";
 import {Refresh, Settings} from "@mui/icons-material";
-import React, {useRef} from "react";
+import React, {useEffect, useRef} from "react";
 import {Transition} from 'react-transition-group';
 import {useAnimations} from "../Root";
 
@@ -33,7 +33,9 @@ function ElevationScroll(props: Props) {
 export interface AppBarProps {
     title: string,
     back: React.ReactElement | null,
-    settings: boolean
+    settings: boolean,
+    loading?: boolean,
+    setLoading?: (loading: boolean) => void,
 }
 
 export function AttentionAppBar(props: AppBarProps) {
@@ -54,6 +56,12 @@ export function AttentionAppBar(props: AppBarProps) {
     };
 
     const revalidator = useRevalidator()
+    useEffect(() => {
+        if (props.setLoading) {
+            props.setLoading(revalidator.state === 'loading')
+        }
+    }, [props.setLoading, revalidator.state])
+
     const ref = useRef(null)
     const Offset = styled('div')(({theme}) => theme.mixins.toolbar);
     return (
@@ -95,7 +103,7 @@ export function AttentionAppBar(props: AppBarProps) {
 
 
                 </ElevationScroll>
-                <Transition nodeRef={ref} in={revalidator.state === 'loading'} timeout={duration}>
+                <Transition nodeRef={ref} in={props.loading === true} timeout={duration}>
                     {state => (
                         state !== 'exited' && state !== 'unmounted' && <LinearProgress ref={ref}
                                                                                      style={{...defaultStyle, ...transitionStyles[state]}}/>
