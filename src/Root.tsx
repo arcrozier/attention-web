@@ -160,7 +160,7 @@ export default function Root() {
 
     return (
         <ThemeProvider theme={theme}>
-            <div style={{
+            <div id={"themed"} style={{
                 minHeight: "100vh",
                 display: "flex",
                 flexDirection: "column",

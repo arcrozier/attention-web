@@ -170,7 +170,9 @@ function FriendCard(props: FriendCardProps) {
     // Creates the overlay
     switch (props.state) {
         case FriendCardState.SEND:
-            overlay = <CSSTransition nodeRef={ref} timeout={overlayDuration} classNames={'overlay'} key={Date.now() % (overlayDuration * 2)}><FloatingDiv parentWidth={width} positionX={displayX} innerRef={ref}>
+            overlay = <CSSTransition nodeRef={ref} timeout={overlayDuration} classNames={'overlay'}
+                                     key={Date.now() % (overlayDuration * 2)}><FloatingDiv
+                parentWidth={width} positionX={displayX} innerRef={ref}>
                 <IconButton style={style} aria-label={"close"} onClick={(e) => {
                     e.preventDefault()
                     props.setState(FriendCardState.NORMAL)
@@ -197,63 +199,65 @@ function FriendCard(props: FriendCardProps) {
             </CSSTransition>
             break
         case FriendCardState.EDIT:
-            overlay = <CSSTransition nodeRef={ref} timeout={overlayDuration} classNames={'overlay'} key={Date.now() % (overlayDuration * 2)}>
+            overlay = <CSSTransition nodeRef={ref} timeout={overlayDuration} classNames={'overlay'}
+                                     key={Date.now() % (overlayDuration * 2)}>
                 <FloatingDiv parentWidth={width} positionX={displayX} innerRef={ref}>
-                <IconButton style={style} aria-label={"close"} onClick={(e) => {
-                    e.preventDefault()
-                    props.setState(FriendCardState.NORMAL)
-                }
-                }>
-                    <Close/>
-                </IconButton>
-                <Button style={style} variant={"contained"} onClick={(e) => {
-                    e.preventDefault()
-                    props.setState(FriendCardState.NORMAL)
-                    setNameDialog(true)
-                }
-                }>
-                    Edit
-                </Button>
-                <Button style={style} color={"error"} onClick={(e) => {
-                    e.preventDefault()
-                    props.setState(FriendCardState.NORMAL)
-                    setDeleteDialog(true)
-                }
-                } variant={"outlined"}>
-                    Delete
-                </Button>
-            </FloatingDiv>
+                    <IconButton style={style} aria-label={"close"} onClick={(e) => {
+                        e.preventDefault()
+                        props.setState(FriendCardState.NORMAL)
+                    }
+                    }>
+                        <Close/>
+                    </IconButton>
+                    <Button style={style} variant={"contained"} onClick={(e) => {
+                        e.preventDefault()
+                        props.setState(FriendCardState.NORMAL)
+                        setNameDialog(true)
+                    }
+                    }>
+                        Edit
+                    </Button>
+                    <Button style={style} color={"error"} onClick={(e) => {
+                        e.preventDefault()
+                        props.setState(FriendCardState.NORMAL)
+                        setDeleteDialog(true)
+                    }
+                    } variant={"outlined"}>
+                        Delete
+                    </Button>
+                </FloatingDiv>
             </CSSTransition>
             break
         case FriendCardState.CANCEL:
-            overlay = <CSSTransition nodeRef={ref} timeout={overlayDuration} classNames={'overlay'} key={Date.now() % (overlayDuration * 2)}>
+            overlay = <CSSTransition nodeRef={ref} timeout={overlayDuration} classNames={'overlay'}
+                                     key={Date.now() % (overlayDuration * 2)}>
                 <div style={{
-                width: "100%",
-                height: "100%",
-                position: "absolute",
-                backgroundColor: progressBG,
-                display: "flex",
-                alignItems: "center",
-                justifyItems: "center",
-                ...style
-            }} onClick={(e) => {
-                e.preventDefault()
-                props.setState(FriendCardState.NORMAL)
-            }
-            }>
-                <div style={{
-                    width: `${cancelProgress / (1000 * props.delay)}%`,
+                    width: "100%",
                     height: "100%",
-                    borderRadius: "1rem",
-                    transition: `${animate ? UPDATE_INTERVAL / 1000 : 0}s linear`,
-                    backgroundColor: progressFG,
                     position: "absolute",
-                    zIndex: 0
-                }}/>
-                <div style={{zIndex: 1}}>
-                    Cancel
+                    backgroundColor: progressBG,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyItems: "center",
+                    ...style
+                }} onClick={(e) => {
+                    e.preventDefault()
+                    props.setState(FriendCardState.NORMAL)
+                }
+                }>
+                    <div style={{
+                        width: `${cancelProgress / (1000 * props.delay)}%`,
+                        height: "100%",
+                        borderRadius: "1rem",
+                        transition: `${animate ? UPDATE_INTERVAL / 1000 : 0}s linear`,
+                        backgroundColor: progressFG,
+                        position: "absolute",
+                        zIndex: 0
+                    }}/>
+                    <div style={{zIndex: 1}}>
+                        Cancel
+                    </div>
                 </div>
-            </div>
             </CSSTransition>
             break
         default:
@@ -451,23 +455,40 @@ export function Home() {
         )
     }
 
-    // TODO gets called infinitely
-    userInfo?.then(() => {
-        console.log("setting loading - promise fulfilled")
-        setLoading(false)
-    })
+    const logout = useLogout()
+    useEffect(() => {
+        userInfo?.then(() => {
+            setLoading(false)
+        }).catch((error: { response: AxiosResponse | undefined | null, request: any }) => {
+            if (error.response && error.response.status === 403) {
+                logout()
+            } else {
+                throw(error)
+            }
+        })
+    }, [userInfo, logout])
 
     return (
         <div className="App">
-            <AttentionAppBar title={"Attention!"} back={null} settings={true} loading={loading} setLoading={(l) => {
-                setLoading((prevState) => {
-                    return prevState || l
-                })
-            }}/>
+            <AttentionAppBar title={"Attention!"} back={null} settings={true} loading={loading}
+                             setLoading={(l) => {
+                                 setLoading((prevState) => {
+                                     return prevState || l
+                                 })
+                             }}/>
 
             {/* TODO better loading (can we get the loading bar?) and error handling */}
-            <React.Suspense fallback={<p>Loading</p>}>
-                <Await resolve={userInfo} errorElement={<p>Error!</p>}>
+            <React.Suspense fallback={null}>
+                <Await resolve={userInfo} errorElement={<div style={{
+                    margin: 0,
+                    display: "flex",
+                    height: "100%",
+                    width: "100%",
+                    alignItems: "center",
+                    justifyContent: "center"
+                }}>
+                    <p>An error occurred</p>
+                </div>}>
                     {(userInfo: Awaited<AxiosResponse<APIResult<UserInfo>>>) => (
                         <ul style={{padding: 0, margin: 0}}>
                             {

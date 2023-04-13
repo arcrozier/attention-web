@@ -43,6 +43,8 @@
         left: 0;
         align-items: center;
         justify-content: center;
+        background-color: #ffffff;
+        z-index: 10;
       }
 
       #splash-img {
@@ -50,22 +52,16 @@
         height: 100%;
         max-width: 10%;
         max-height: 10%;
-        background-color: #ffffff;
-        z-index: 10;
+        background-color: unset;
       }
 
       #root:empty {
-        background-color: #ffffff;
         min-height: 100vh;
         margin: 0;
       }
 
       @media (prefers-color-scheme: dark) {
-        #root:empty {
-          background-color: #121212 !important;
-        }
-
-        #splash-img {
+        #splash-wrapper {
           background-color: #121212 !important;
         }
       }
@@ -125,41 +121,70 @@
         splash();
       }
 
+      const animateOut = () => {
+        const wrapper = document.getElementById('splash-wrapper')
+        // img -> wrapper
+        console.assert(!img || wrapper)
+        if (!wrapper) {
+          // img is gone
+          img = null
+        } else if (!img) {
+          // wrapper is not null
+          // the in-animation hasn't played
+          wrapper.remove()
+          // element removed
+        } else {
+          // img != null && wrapper != null
+          if (loadingAnimation && loadingAnimation.playState === 'running') {
+            loadingAnimation.pause()
+          }
+          if (loopingAnimation && loopingAnimation.playState === 'running') {
+            loopingAnimation.pause()
+          }
+          const disappearKeyframes = [
+            {opacity: "0"}
+          ]
+          const disappearAnimation = wrapper.animate(disappearKeyframes, {
+            direction: "normal",
+            duration: 500,
+            easing: "ease-in",
+            fill: "forwards"
+          })
+          disappearAnimation.onfinish = () => {
+            wrapper.remove()
+            img = null;
+          }
+        }
+      }
+
+      const detectPopulated = () => {
+        const root = document.getElementById('root')
+        if (root.hasChildNodes()) {
+          console.log(root)
+          animateOut()
+        } else {
+          const observer = new MutationObserver(() => {
+            console.log(root)
+            if (root.hasChildNodes()) {
+              for (const child of root.childNodes) {
+                console.log(child)
+                console.log(child.style.display)
+                console.log(child.checkVisibility())
+                if (window.getComputedStyle(child).display !== 'none') {
+                  animateOut()
+                  //observer.disconnect()
+                }
+              }
+              animateOut()
+            }
+          })
+          observer.observe(root, {attributes: true, childList: true, subtree: true,
+            characterData: true})
+        }
+      }
       if (document.readyState !== "complete") {
         window.addEventListener("load", () => {
-          const wrapper = document.getElementById('splash-wrapper')
-          // img -> wrapper
-          console.assert(!img || wrapper)
-          if (!wrapper) {
-            // img is gone
-            img = null
-          } else if (!img) {
-            // wrapper is not null
-            // the in-animation hasn't played
-            wrapper.remove()
-            // element removed
-          } else {
-            // img != null && wrapper != null
-            if (loadingAnimation && loadingAnimation.playState === 'running') {
-              loadingAnimation.pause()
-            }
-            if (loopingAnimation && loopingAnimation.playState === 'running') {
-              loopingAnimation.pause()
-            }
-            const disappearKeyframes = [
-              {opacity: "0"}
-            ]
-            const disappearAnimation = img.animate(disappearKeyframes, {
-              direction: "normal",
-              duration: 500,
-              easing: "ease-in",
-              fill: "forwards"
-            })
-            disappearAnimation.onfinish = () => {
-              wrapper.remove()
-              img = null;
-            }
-          }
+          detectPopulated()
         })
       } else {
         document.getElementById('splash-wrapper').remove()

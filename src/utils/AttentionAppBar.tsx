@@ -59,7 +59,6 @@ export function AttentionAppBar(props: AppBarProps) {
 
     const revalidator = useRevalidator()
     useEffect(() => {
-        console.log("setting loading")
         if (setLoading) {
             setLoading(revalidator.state === 'loading')
         }
