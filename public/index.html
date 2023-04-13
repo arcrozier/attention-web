@@ -116,8 +116,10 @@
 
       if (document.readyState === "loading") {
         // Loading hasn't finished yet
-        document.addEventListener("DOMContentLoaded", () => {
-          splash()
+        document.addEventListener("readystatechange", (event) => {
+          if (event.target.readyState === "interactive") {
+            splash()
+          }
         });
       } else if (document.readyState !== "complete") {
         // `DOMContentLoaded` has already fired
@@ -155,7 +157,7 @@
               fill: "forwards"
             })
             disappearAnimation.onfinish = () => {
-              img.remove()
+              wrapper.remove()
               img = null;
             }
           }
@@ -183,6 +185,5 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
-  <!-- TODO finish adding splash image -->
   </body>
 </html>
