@@ -42,6 +42,8 @@ export function AttentionAppBar(props: AppBarProps) {
 
     const duration = useAnimations() ? 200 : 0;
 
+    const {loading, setLoading} = props
+
     const defaultStyle = {
         transition: `height ${duration}ms ease-in-out`,
         height: 0,
@@ -57,10 +59,11 @@ export function AttentionAppBar(props: AppBarProps) {
 
     const revalidator = useRevalidator()
     useEffect(() => {
-        if (props.setLoading) {
-            props.setLoading(revalidator.state === 'loading')
+        console.log("setting loading")
+        if (setLoading) {
+            setLoading(revalidator.state === 'loading')
         }
-    }, [props.setLoading, revalidator.state])
+    }, [setLoading, revalidator.state])
 
     const ref = useRef(null)
     const Offset = styled('div')(({theme}) => theme.mixins.toolbar);
@@ -103,7 +106,7 @@ export function AttentionAppBar(props: AppBarProps) {
 
 
                 </ElevationScroll>
-                <Transition nodeRef={ref} in={props.loading === true} timeout={duration}>
+                <Transition nodeRef={ref} in={loading === true} timeout={duration}>
                     {state => (
                         state !== 'exited' && state !== 'unmounted' && <LinearProgress ref={ref}
                                                                                      style={{...defaultStyle, ...transitionStyles[state]}}/>

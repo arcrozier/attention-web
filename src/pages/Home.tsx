@@ -451,7 +451,9 @@ export function Home() {
         )
     }
 
+    // TODO gets called infinitely
     userInfo?.then(() => {
+        console.log("setting loading - promise fulfilled")
         setLoading(false)
     })
 
