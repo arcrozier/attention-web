@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
+<head>
+    <meta charset="utf-8"/>
     <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/favicon-16x16.png">
@@ -9,11 +9,11 @@
     <link rel="mask-icon" href="%PUBLIC_URL%/safari-pinned-tab.svg" color="#5bbad5">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#2740fd">
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#bbc2ff" />
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#bbc2ff"/>
     <meta
-      name="description"
-      content="The web application for Attention"
+            name="description"
+            content="The web application for Attention"
     />
     <!--
       manifest.json provides metadata used when your web app is installed on a
@@ -30,184 +30,181 @@
     -->
 
     <style>
-      body {
-        margin: 0;
-      }
-
-      #splash-wrapper {
-        display: flex;
-        height: 100%;
-        width: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        align-items: center;
-        justify-content: center;
-        background-color: #ffffff;
-        z-index: 10;
-      }
-
-      #splash-img {
-        opacity: 0;
-        height: 100%;
-        max-width: 10%;
-        max-height: 10%;
-        background-color: unset;
-      }
-
-      #root:empty {
-        min-height: 100vh;
-        margin: 0;
-      }
-
-      @media (prefers-color-scheme: dark) {
-        #splash-wrapper {
-          background-color: #121212 !important;
+        body {
+            margin: 0;
         }
-      }
+
+        #splash-wrapper {
+            display: flex;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            align-items: center;
+            justify-content: center;
+            background-color: #ffffff;
+            z-index: 10;
+        }
+
+        #splash-img {
+            opacity: 0;
+            height: 100%;
+            max-width: 10%;
+            max-height: 10%;
+            background-color: unset;
+        }
+
+        #root:empty {
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            #splash-wrapper {
+                background-color: #121212 !important;
+            }
+        }
     </style>
 
     <script>
-      let img;
+        let img;
 
-      let loadingAnimation;
-      let loopingAnimation;
+        let loadingAnimation;
+        let loopingAnimation;
 
-      function splash() {
-        img = document.getElementById('splash-img')
-        img.classList.remove('loading')
-        if (!img) {
-          return
-        }
-
-        const appearKeyframes = [
-          {opacity: "1"}
-        ]
-
-        const loadingKeyframes = [
-          {opacity: "1"},
-          {opacity: "0.6"}
-        ]
-
-        const whenLoaded = () => {
-          loadingAnimation = img.animate(appearKeyframes, 2000)
-          loadingAnimation.onfinish = () => {
-            loopingAnimation = img.animate(loadingKeyframes, {
-              direction: "alternate",
-              duration: 2000,
-              easing: "ease-in-out",
-              iterations: Infinity
-            })
-          }
-        }
-        if (img.complete) {
-          whenLoaded()
-        } else {
-          img.onload = () => {
-            whenLoaded()
-          }
-        }
-      }
-
-      if (document.readyState === "loading") {
-        // Loading hasn't finished yet
-        document.addEventListener("readystatechange", (event) => {
-          if (event.target.readyState === "interactive") {
-            splash()
-          }
-        });
-      } else if (document.readyState !== "complete") {
-        // `DOMContentLoaded` has already fired
-        splash();
-      }
-
-      const animateOut = () => {
-        const wrapper = document.getElementById('splash-wrapper')
-        // img -> wrapper
-        console.assert(!img || wrapper)
-        if (!wrapper) {
-          // img is gone
-          img = null
-        } else if (!img) {
-          // wrapper is not null
-          // the in-animation hasn't played
-          wrapper.remove()
-          // element removed
-        } else {
-          // img != null && wrapper != null
-          if (loadingAnimation && loadingAnimation.playState === 'running') {
-            loadingAnimation.pause()
-          }
-          if (loopingAnimation && loopingAnimation.playState === 'running') {
-            loopingAnimation.pause()
-          }
-          const disappearKeyframes = [
-            {opacity: "0"}
-          ]
-          const disappearAnimation = wrapper.animate(disappearKeyframes, {
-            direction: "normal",
-            duration: 500,
-            easing: "ease-in",
-            fill: "forwards"
-          })
-          disappearAnimation.onfinish = () => {
-            wrapper.remove()
-            img = null;
-          }
-        }
-      }
-
-      const detectPopulated = () => {
-        const root = document.getElementById('root')
-        if (root.hasChildNodes()) {
-          console.log(root)
-          animateOut()
-        } else {
-          const observer = new MutationObserver(() => {
-            console.log(root)
-            if (root.hasChildNodes()) {
-              for (const child of root.childNodes) {
-                console.log(child)
-                console.log(child.style.display)
-                console.log(child.checkVisibility())
-                if (window.getComputedStyle(child).display !== 'none') {
-                  animateOut()
-                  //observer.disconnect()
-                }
-              }
-              animateOut()
+        function splash() {
+            img = document.getElementById('splash-img')
+            img.classList.remove('loading')
+            if (!img) {
+                return
             }
-          })
-          observer.observe(root, {attributes: true, childList: true, subtree: true,
-            characterData: true})
+
+            const appearKeyframes = [
+                {opacity: "1"}
+            ]
+
+            const loadingKeyframes = [
+                {opacity: "1"},
+                {opacity: "0.6"}
+            ]
+
+            const whenLoaded = () => {
+                loadingAnimation = img.animate(appearKeyframes, 2000)
+                loadingAnimation.onfinish = () => {
+                    loopingAnimation = img.animate(loadingKeyframes, {
+                        direction: "alternate",
+                        duration: 2000,
+                        easing: "ease-in-out",
+                        iterations: Infinity
+                    })
+                }
+            }
+            if (img.complete) {
+                whenLoaded()
+            } else {
+                img.onload = () => {
+                    whenLoaded()
+                }
+            }
         }
-      }
-      if (document.readyState !== "complete") {
-        window.addEventListener("load", () => {
-          detectPopulated()
-        })
-      } else {
-        document.getElementById('splash-wrapper').remove()
-      }
+
+        if (document.readyState === "loading") {
+            // Loading hasn't finished yet
+            document.addEventListener("readystatechange", (event) => {
+                if (event.target.readyState === "interactive") {
+                    splash()
+                }
+            });
+        } else if (document.readyState !== "complete") {
+            // `DOMContentLoaded` has already fired
+            splash();
+        }
+
+        const animateOut = () => {
+            const wrapper = document.getElementById('splash-wrapper')
+            // img -> wrapper
+            console.assert(!img || wrapper)
+            if (!wrapper) {
+                // img is gone
+                img = null
+            } else if (!img) {
+                // wrapper is not null
+                // the in-animation hasn't played
+                wrapper.remove()
+                // element removed
+            } else {
+                // img != null && wrapper != null
+                if (loadingAnimation && loadingAnimation.playState === 'running') {
+                    loadingAnimation.pause()
+                }
+                if (loopingAnimation && loopingAnimation.playState === 'running') {
+                    loopingAnimation.pause()
+                }
+                const disappearKeyframes = [
+                    {opacity: "0"}
+                ]
+                const disappearAnimation = wrapper.animate(disappearKeyframes, {
+                    direction: "normal",
+                    duration: 500,
+                    easing: "ease-in",
+                    fill: "forwards"
+                })
+                disappearAnimation.onfinish = () => {
+                    wrapper.remove()
+                    img = null;
+                }
+            }
+        }
+
+        let shouldExit = false
+
+        const detectPopulated = () => {
+            const root = document.getElementById('root')
+            const observer = new MutationObserver(async () => {
+                if (root.hasChildNodes()) {
+                    for (const child of root.childNodes) {
+                        if (child.checkVisibility()) {
+                            shouldExit = true
+                            await new Promise(r => setTimeout(r, 100));
+                            if (shouldExit) {
+                                animateOut()
+                                observer.disconnect()
+                                return
+                            }
+                        }
+                    }
+                    shouldExit = false
+                }
+            })
+            observer.observe(root, {attributes: true, childList: true, subtree: true})
+        }
+        if (document.readyState !== "complete") {
+            window.addEventListener("load", () => {
+                detectPopulated()
+            })
+        } else {
+            document.getElementById('splash-wrapper').remove()
+        }
     </script>
     <title>Attention!</title>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <div id="splash-wrapper">
-      <img id="splash-img" class="loading" src="%PUBLIC_URL%/icon.svg" alt="Application loading"
-           fetchpriority="high" />
-    </div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+</head>
+<body>
+<noscript>You need to enable JavaScript to run this app.</noscript>
+<div id="root"></div>
+<div id="splash-wrapper">
+    <img id="splash-img" class="loading" src="%PUBLIC_URL%/icon.svg" alt="Application loading"
+         fetchpriority="high"/>
+</div>
+<!--
+  This HTML file is a template.
+  If you open it directly in the browser, you will see an empty page.
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+  You can add webfonts, meta tags, or analytics to this file.
+  The build step will place the bundled scripts into the <body> tag.
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
-  </body>
+  To begin the development, run `npm start` or `yarn start`.
+  To create a production bundle, use `npm run build` or `yarn build`.
+-->
+</body>
 </html>

@@ -460,6 +460,7 @@ export function Home() {
         userInfo?.then(() => {
             setLoading(false)
         }).catch((error: { response: AxiosResponse | undefined | null, request: any }) => {
+            setLoading(false)
             if (error.response && error.response.status === 403) {
                 logout()
             } else {
