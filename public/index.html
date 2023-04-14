@@ -43,7 +43,7 @@
             left: 0;
             align-items: center;
             justify-content: center;
-            background-color: #ffffff;
+            background-color: var(--bg);
             z-index: 10;
         }
 
@@ -55,14 +55,16 @@
             background-color: unset;
         }
 
-        #root:empty {
+        #root {
             min-height: 100vh;
             margin: 0;
+            --bg: #ffffff;
+            background-color: var(--bg);
         }
 
         @media (prefers-color-scheme: dark) {
-            #splash-wrapper {
-                background-color: #121212 !important;
+            #root {
+                --bg: #121212 !important;
             }
         }
     </style>

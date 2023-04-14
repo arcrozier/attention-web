@@ -3,7 +3,7 @@ import './App.css';
 import {
     defer,
     Outlet,
-    useLoaderData,
+    useLoaderData, useLocation, useOutlet,
     useOutletContext
 } from "react-router-dom";
 import {APIResult, getUserInfo, registerDevice} from "./utils/repository";
@@ -146,6 +146,9 @@ function App() {
         webApp: webApp,
         userInfo: userInfo.userInfo
     }
+
+    const location = useLocation()
+    const currentOutlet = useOutlet()
 
     useEffect(() => {
         if (userInfo !== null) {
