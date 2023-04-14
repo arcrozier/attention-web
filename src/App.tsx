@@ -3,7 +3,9 @@ import './App.css';
 import {
     defer,
     Outlet,
-    useLoaderData, useLocation, useOutlet,
+    useLoaderData,
+    useLocation,
+    useOutlet,
     useOutletContext
 } from "react-router-dom";
 import {APIResult, getUserInfo, registerDevice} from "./utils/repository";
