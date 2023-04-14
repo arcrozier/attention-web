@@ -1,6 +1,11 @@
 import React, {useEffect} from 'react';
 import './App.css';
-import {defer, Outlet, useLoaderData, useOutletContext} from "react-router-dom";
+import {
+    defer,
+    Outlet,
+    useLoaderData, useLocation, useOutlet,
+    useOutletContext
+} from "react-router-dom";
 import {APIResult, getUserInfo, registerDevice} from "./utils/repository";
 import {Properties, useProps as useRootProps} from "./Root";
 import {AxiosError, AxiosResponse} from "axios";
@@ -147,6 +152,9 @@ function App() {
         webApp: webApp,
         userInfo: userInfo.userInfo
     }
+
+    const location = useLocation()
+    const currentOutlet = useOutlet()
 
     useEffect(() => {
         if (userInfo !== null) {
