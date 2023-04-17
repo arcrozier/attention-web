@@ -20,7 +20,6 @@ const router = createBrowserRouter([
         },
         children: [
             {
-                // todo somehow get add/?username=<username> to work
                 async lazy () {
                     const {App, userInfoLoader} = await import('./App')
                     return {Component: App, loader: userInfoLoader}
