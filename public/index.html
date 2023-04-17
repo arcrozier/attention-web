@@ -30,6 +30,10 @@
     -->
 
     <style>
+        :root {
+            --bg: #ffffff;
+        }
+
         body {
             margin: 0;
         }
@@ -44,6 +48,7 @@
             align-items: center;
             justify-content: center;
             background-color: var(--bg);
+            opacity: 1;
             z-index: 10;
         }
 
@@ -58,18 +63,18 @@
         #root {
             min-height: 100vh;
             margin: 0;
-            --bg: #ffffff;
             background-color: var(--bg);
         }
 
         @media (prefers-color-scheme: dark) {
-            #root {
+            :root {
                 --bg: #121212 !important;
             }
         }
     </style>
 
     <script>
+        const animate = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
         let img;
 
         let loadingAnimation;
@@ -77,7 +82,6 @@
 
         function splash() {
             img = document.getElementById('splash-img')
-            img.classList.remove('loading')
             if (!img) {
                 return
             }
@@ -92,14 +96,19 @@
             ]
 
             const whenLoaded = () => {
-                loadingAnimation = img.animate(appearKeyframes, 2000)
+                loadingAnimation = img.animate(appearKeyframes, {
+                    duration: animate ? 2000 : 0,
+                    fill: "forwards"
+                })
                 loadingAnimation.onfinish = () => {
-                    loopingAnimation = img.animate(loadingKeyframes, {
-                        direction: "alternate",
-                        duration: 2000,
-                        easing: "ease-in-out",
-                        iterations: Infinity
-                    })
+                    if (animate) {
+                        loopingAnimation = img.animate(loadingKeyframes, {
+                            direction: "alternate",
+                            duration: 2000,
+                            easing: "ease-in-out",
+                            iterations: Infinity
+                        })
+                    }
                 }
             }
             if (img.complete) {
@@ -137,6 +146,13 @@
                 // element removed
             } else {
                 // img != null && wrapper != null
+
+                if (!animate) {
+                    wrapper.remove()
+                    img = null
+                    return
+                }
+
                 if (loadingAnimation && loadingAnimation.playState === 'running') {
                     loadingAnimation.pause()
                 }
@@ -148,10 +164,11 @@
                 ]
                 const disappearAnimation = wrapper.animate(disappearKeyframes, {
                     direction: "normal",
-                    duration: 500,
+                    duration: animate ? 500 : 0,
                     easing: "ease-in",
                     fill: "forwards"
                 })
+
                 disappearAnimation.onfinish = () => {
                     wrapper.remove()
                     img = null;
@@ -163,7 +180,8 @@
 
         const detectPopulated = () => {
             const root = document.getElementById('root')
-            const observer = new MutationObserver(async () => {
+
+            const checkRoot = async () => {
                 if (root.hasChildNodes()) {
                     for (const child of root.childNodes) {
                         if (child.checkVisibility()) {
@@ -172,13 +190,17 @@
                             if (shouldExit) {
                                 animateOut()
                                 observer.disconnect()
+                                shouldExit = false
                                 return
                             }
                         }
                     }
                     shouldExit = false
                 }
-            })
+            }
+
+            const observer = new MutationObserver(checkRoot)
+            checkRoot()
             observer.observe(root, {attributes: true, childList: true, subtree: true})
         }
         if (document.readyState !== "complete") {

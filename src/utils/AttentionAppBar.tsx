@@ -34,6 +34,7 @@ export interface AppBarProps {
     title: string,
     back: React.ReactElement | null,
     settings: boolean,
+    refresh: boolean,
     loading?: boolean,
     setLoading?: (loading: boolean) => void,
 }
@@ -83,11 +84,11 @@ export function AttentionAppBar(props: AppBarProps) {
                             </Typography>
 
                             <div>
-                                <IconButton size={"large"} aria-label={"refresh"} onClick={() => {
+                                {props.refresh && <IconButton size={"large"} aria-label={"refresh"} onClick={() => {
                                     revalidator.revalidate()
                                 }} color="inherit">
                                     <Refresh/>
-                                </IconButton>
+                                </IconButton>}
                                 {props.settings && <IconButton
                                     size="large"
                                     aria-label="settings"

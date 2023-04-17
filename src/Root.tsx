@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Outlet, useNavigate, useOutletContext} from "react-router-dom";
+import {Outlet, useLocation, useNavigate, useOutletContext} from "react-router-dom";
 import Cookies from "js-cookie";
 import {
     Alert,
@@ -36,8 +36,9 @@ export function useProps() {
 
 export function useBack() {
     const navigate = useNavigate()
+    const location = useLocation()
     return (url: string) => {
-        if (window.history.state === null || !window.history.state.usr || !window.history.state.usr.goBack) {
+        if (location.state === null || !location.state.usr || !location.state.usr.goBack) {
             window.history.replaceState({goBack: false}, "", url)
             window.history.pushState({goBack: true}, "", '')
         }
@@ -49,15 +50,17 @@ export function useBack() {
  * Returns a function that performs a logout
  *
  * redirect: boolean - whether to redirect to the login page after logging out (defaults to true)
+ * onCompleteURL: string - the URL to redirect to after the user successfully logs in (defaults
+ * to null, which redirects the user to the home page)
  */
-export function useLogout(): (redirect?: boolean) => void {
+export function useLogout(): (redirect?: boolean, onCompleteURL?: string | null) => void {
     const navigate = useNavigate()
 
-    return (redirect: boolean = true) => {
+    return (redirect: boolean = true, onCompleteURL: string | null = null) => {
         Cookies.remove(SESSION_ID_COOKIE)
         window.localStorage.clear()
         if (redirect) {
-            navigate('/login', {replace: true})
+            navigate('/login', {replace: true, state: {redirect: onCompleteURL}})
         }
     }
 }
@@ -91,7 +94,7 @@ function supportsApp(): boolean {
     return false
 }
 
-export default function Root() {
+export function Root() {
     const isWebApp = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
 
     const darkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -139,7 +142,7 @@ export default function Root() {
         backgroundColor: primaryColor,
         color: theme.palette.getContrastText(primaryColor)
     }} href={'/app/'}>
-        <Typography variant={"button"}>
+        <Typography variant={"button"} component={"span"}>
             Download the app!
         </Typography>
 
@@ -160,7 +163,7 @@ export default function Root() {
 
     return (
         <ThemeProvider theme={theme}>
-            <div id={"themed"} style={{
+            <div style={{
                 minHeight: "100vh",
                 display: "flex",
                 flexDirection: "column",

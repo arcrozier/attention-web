@@ -1,7 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from "react";
 import {Friend, notify, useProps, UserInfo} from "../App";
 import {SnackbarStatus, useAnimations, useLogout, useSnackBarStatus, useTitle} from "../Root";
-import {AttentionAppBar} from "../utils/AttentionAppBar";
 import {
     Button,
     Dialog,
@@ -20,7 +19,7 @@ import {DEFAULT_DELAY, LIST_ELEMENT_PADDING} from "../utils/defs";
 import {APIResult, sendMessage} from "../utils/repository";
 import {AxiosError, AxiosResponse} from "axios";
 import {CSSTransition, TransitionGroup} from "react-transition-group";
-import {Await} from "react-router-dom"
+import {Await, useParams, useSearchParams} from "react-router-dom"
 
 const DEFAULT_PFP_SIZE = "40pt"
 
@@ -331,11 +330,11 @@ function FriendCard(props: FriendCardProps) {
                     alignItems: 'left',
                     justifyItems: 'center'
                 }}>
-                    <Typography variant={"h6"}>
+                    <Typography variant={"h6"} component={"h6"}>
                         {friend.name}
                     </Typography>
                     {friend.last_message_status !== null && sendingStatus !== null &&
-                    <Typography variant={"subtitle2"} color={sendError ? 'error' : 'text.disabled'}>
+                    <Typography variant={"subtitle2"} component={"h6"} color={sendError ? 'error' : 'text.disabled'}>
                         {sendSubtitle}
                     </Typography>
                     }
@@ -427,10 +426,13 @@ export function Home() {
 
     const [, setSnackbar] = useSnackBarStatus()
 
-    const [loading, setLoading] = useState(true)
-
     const tempDelay = +(window.localStorage.getItem("delay") ?? DEFAULT_DELAY)
     const delay = isNaN(tempDelay) ? DEFAULT_DELAY : tempDelay
+
+    const [queryParams, ] = useSearchParams()
+
+    const params = useParams()
+    console.log(params)
 
     useTitle(webApp, 'Home')
 
@@ -455,29 +457,8 @@ export function Home() {
         )
     }
 
-    const logout = useLogout()
-    useEffect(() => {
-        userInfo?.then(() => {
-            setLoading(false)
-        }).catch((error: { response: AxiosResponse | undefined | null, request: any }) => {
-            setLoading(false)
-            if (error.response && error.response.status === 403) {
-                logout()
-            } else {
-                throw(error)
-            }
-        })
-    }, [userInfo, logout])
-
     return (
         <div className="App">
-            <AttentionAppBar title={"Attention!"} back={null} settings={true} loading={loading}
-                             setLoading={(l) => {
-                                 setLoading((prevState) => {
-                                     return prevState || l
-                                 })
-                             }}/>
-
             {/* TODO better loading (can we get the loading bar?) and error handling */}
             <React.Suspense fallback={null}>
                 <Await resolve={userInfo} errorElement={<div style={{

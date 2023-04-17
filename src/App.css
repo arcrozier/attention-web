@@ -2,40 +2,10 @@
   color: #61dafb;
 }
 
-#error-page {
-  text-align: center;
-}
-
-.center-horizontal {
-  text-align: center;
-  justify-content: center;
-}
-
-.center {
-  text-align: center;
-  justify-content: center;
-  display: flex;
-  align-items: center;
-}
-
-html, body, #root {
-  min-height: 100vh;
-}
-
 .btn {
   display: block;
   text-decoration: none;
   color: inherit;
-}
-
-.textfield-width {
-  width: 200pt;
-  max-width: 95%;
-  margin: auto;
-}
-
-.textfield-width > * {
-  width: 100%;
 }
 
 a.default {

@@ -1,18 +1,20 @@
-import React, {useEffect} from 'react';
+import React, {ReactElement, useEffect, useRef, useState} from 'react';
 import './App.css';
 import {
     defer,
-    Outlet,
-    useLoaderData,
-    useLocation,
-    useOutlet,
+    Outlet, redirect,
+    useLoaderData, useLocation,
+    useMatches,
     useOutletContext
 } from "react-router-dom";
 import {APIResult, getUserInfo, registerDevice} from "./utils/repository";
-import {Properties, useProps as useRootProps} from "./Root";
-import {AxiosError, AxiosResponse} from "axios";
+import {Properties, useBack, useLogout, useProps as useRootProps} from "./Root";
+import {AxiosError, AxiosHeaders, AxiosResponse} from "axios";
 import {initializeApp} from 'firebase/app';
 import {getMessaging, getToken} from "firebase/messaging";
+import {AttentionAppBar} from "./utils/AttentionAppBar";
+import {IconButton, Tooltip} from "@mui/material";
+import {ArrowBack} from "@mui/icons-material";
 
 const key = "BD_lSto79pwcXtKhH2BCtvf_KMpm3ut6C1ifTIozgLH054fJigE33tR-fqLHRCm13Oms1BYW9coUpqR3Ca5olxk"
 
@@ -126,7 +128,10 @@ export interface UserInfo {
     friends: Friend[]
 }
 
-export async function userInfoLoader() {
+export async function userInfoLoader({params}: {params: {}}) {
+    if ('add' in params && params.add !== 'add') {
+        return redirect('/')
+    }
     return defer({userInfo: getUserInfo()})
 }
 
@@ -143,7 +148,7 @@ export function notify(title: string, options: NotificationOptions | undefined =
     })
 }
 
-function App() {
+export function App() {
 
     const userInfo = useLoaderData() as { userInfo: Promise<AxiosResponse<APIResult<UserInfo>>> }
 
@@ -155,20 +160,63 @@ function App() {
         userInfo: userInfo.userInfo
     }
 
+    const [loading, setLoading] = useState(true)
+
+    const logout = useLogout()
+
     const location = useLocation()
-    const currentOutlet = useOutlet()
 
     useEffect(() => {
-        if (userInfo !== null) {
-            getNotificationPermission()
+        userInfo.userInfo?.then(() => {
+            setLoading(false)
+        }).catch((error: { response: AxiosResponse | undefined | null, request: any }) => {
+            setLoading(false)
+            if (error.response && error.response.status === 403) {
+                logout(true, `${location.pathname}${location.search}`)
+            } else {
+                throw(error)
+            }
+        })
+    }, [userInfo.userInfo, logout, location.pathname, location.search])
+
+    const matches = useMatches()
+
+    const back = useBack()
+
+    const appBarParams = matches.filter((match) => match.handle && 'title' in (match.handle as {}))[0].handle as {title: string, back: null | {title: string, url: string}, refresh: boolean, settings: boolean}
+
+    const backButton = useRef<ReactElement | null>(null)
+    useEffect(() => {
+        if (appBarParams.back) {
+            const url = appBarParams.back.url
+            backButton.current = <Tooltip title={appBarParams.back.title}>
+                <IconButton
+                    size="large"
+                    edge="start"
+                    color="inherit"
+                    aria-label="home"
+                    sx={{ mr: 2 }}
+                    onClick={() => {
+                        back(url)
+                    }}
+                >
+                    <ArrowBack />
+                </IconButton>
+            </Tooltip>
         }
-    }, [userInfo])
+    }, [appBarParams.back, back])
+
+
 
     return (
         <div className="App">
+            <AttentionAppBar title={appBarParams.title} back={backButton.current} settings={appBarParams.settings} loading={loading} refresh={appBarParams.refresh}
+                             setLoading={(l) => {
+                                 setLoading((prevState) => {
+                                     return prevState || l
+                                 })
+                             }}/>
             <Outlet context={props}/>
         </div>
     );
 }
-
-export default App;

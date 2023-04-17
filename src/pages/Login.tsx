@@ -1,6 +1,7 @@
 import {useBack, useLogout, useProps, useTitle} from "../Root";
 import {Logo} from "../utils/images";
 import React, {useEffect, useState} from "react";
+import '../Login.css';
 import {
     Button,
     Checkbox,
@@ -14,7 +15,7 @@ import {
     useTheme
 } from "@mui/material";
 import {ArrowBack, Check, Close, Visibility, VisibilityOff} from "@mui/icons-material";
-import {Link, Outlet, useNavigate} from "react-router-dom";
+import {Link, Outlet, useLocation, useNavigate} from "react-router-dom";
 import {
     couldBeEmail,
     LIST_ELEMENT_PADDING,
@@ -72,12 +73,13 @@ export function Login() {
     const {webApp, darkMode} = useProps()
 
     const navigate = useNavigate()
+    const location = useLocation()
     const logout = useLogout()
 
     useEffect(() => {
         if (Cookies.get(SESSION_ID_COOKIE)) {
             checkLogin().then(() => {
-                navigate('/', {replace: true})
+                navigate(location.state.redirect ? location.state.redirect : '/', {replace: true})
             }).catch((error) => {
                 if (error.response && error.response.status === 403) {
                     logout(false)
@@ -86,7 +88,7 @@ export function Login() {
         } else {
             logout(false)
         }
-    }, [navigate, logout])
+    }, [navigate, logout, location.state.redirect])
 
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
@@ -109,7 +111,7 @@ export function Login() {
         setLoading(true)
 
         loginPromise.then(() => {
-            navigate('/', {replace: true})
+            navigate(location.state.redirect ? location.state.redirect : '/', {replace: true})
         }).catch((error) => {
             if (error.response && error.response.status === 403) {
                 setPasswordStatus({error: true, message: 'Invalid username or password'})
@@ -139,7 +141,7 @@ export function Login() {
                  data-itp_support="true">
             </div>
 
-            <Typography variant={"h3"}>Login</Typography>
+            <Typography variant={"h3"} component={"h3"}>Login</Typography>
             <div style={{height: LIST_ELEMENT_PADDING}}/>
             <form>
             <div className={"textfield-width"}>
@@ -198,6 +200,7 @@ export function Login() {
 
             <div style={{height: LIST_ELEMENT_PADDING}}/>
             <Button component={Link} to={'create-account/'} state={{
+                ...location.state,
                 goBack: true
             }}>
                 Create account
@@ -210,6 +213,7 @@ export function CreateAccount() {
 
     const {webApp, darkMode} = useProps()
     const logout = useLogout()
+    const location = useLocation()
 
     useEffect(() => {
         logout(false)
@@ -275,7 +279,7 @@ export function CreateAccount() {
 
             createAccount(username, email, firstName, lastName, password, tosAgree).then(() => {
                 login(username, password).then(() => {
-                        navigate('/', {replace: true})
+                        navigate('/', {replace: true, state: location.state})
                     }
                 )
             }).catch((error) => {
@@ -313,7 +317,7 @@ export function CreateAccount() {
                 }} size={"large"}><ArrowBack/></IconButton>
             </Tooltip>
 
-            <Typography variant={"h3"}>Create Account</Typography>
+            <Typography variant={"h3"} component={"h3"}>Create Account</Typography>
             <div style={{height: LIST_ELEMENT_PADDING}}/>
             <div className={"textfield-width"}>
                 <TextField autoComplete={"username"} variant={"outlined"}
