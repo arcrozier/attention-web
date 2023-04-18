@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Outlet, useLocation, useNavigate, useOutletContext} from "react-router-dom";
 import Cookies from "js-cookie";
 import {
@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import {Close} from "@mui/icons-material";
 import {SESSION_ID_COOKIE} from "./utils/defs";
+import {SwitchTransition, CSSTransition} from "react-transition-group";
 
 
 export interface Properties {
@@ -98,6 +99,7 @@ export function Root() {
     const isWebApp = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
 
     const darkMode = useMediaQuery('(prefers-color-scheme: dark)');
+    const location = useLocation()
 
     const theme = React.useMemo(
         () =>
@@ -161,6 +163,8 @@ export function Root() {
         </IconButton>
         </a>
 
+    const nodeRef = useRef(null)
+
     return (
         <ThemeProvider theme={theme}>
             <div style={{
@@ -170,7 +174,18 @@ export function Root() {
                 backgroundColor: theme.palette.background.default,
                 color: theme.palette.getContrastText(theme.palette.background.default)
             }}>
-                <Outlet context={props}/>
+                <SwitchTransition>
+                    <CSSTransition
+                        key={location.pathname}
+                        nodeRef={nodeRef}
+                        timeout={300}
+                        classNames="page"
+                        unmountOnExit={true}>
+                        <div className="page">
+                            <Outlet context={props}/>
+                        </div>
+                    </CSSTransition>
+                </SwitchTransition>
                 {showPrompt && appBtn}
             </div>
             <Snackbar open={snackbar !== null} onClose={() => setSnackbar(null)} autoHideDuration={snackbar?.autoHideDuration}>
