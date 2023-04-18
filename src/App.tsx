@@ -9,7 +9,7 @@ import {
 } from "react-router-dom";
 import {APIResult, getUserInfo, registerDevice} from "./utils/repository";
 import {Properties, useBack, useLogout, useProps as useRootProps} from "./Root";
-import {AxiosError, AxiosHeaders, AxiosResponse} from "axios";
+import {AxiosError, AxiosResponse} from "axios";
 import {initializeApp} from 'firebase/app';
 import {getMessaging, getToken} from "firebase/messaging";
 import {AttentionAppBar} from "./utils/AttentionAppBar";
