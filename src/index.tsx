@@ -1,4 +1,4 @@
-import React, {Suspense} from 'react';
+import React, {createRef, Suspense} from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import './animations.css';
@@ -18,11 +18,17 @@ const router = createBrowserRouter([
             const [{Root}, {ErrorPage}] = await Promise.all([import('./Root'), import('./pages/ErrorPage')])
             return {Component: Root, ErrorBoundary: ErrorPage}
         },
+        handle: {
+            ref: createRef()
+        },
         children: [
             {
                 async lazy () {
                     const {App, userInfoLoader} = await import('./App')
                     return {Component: App, loader: userInfoLoader}
+                },
+                handle: {
+                    ref: createRef()
                 },
                 children: [
                     {
@@ -33,11 +39,14 @@ const router = createBrowserRouter([
                             return {Component: Home}
                         },
                         handle: {
-                            title: "Attention!",
-                            back: null,
-                            settings: true,
-                            refresh: true
-                        }
+                            appBar: {
+                                title: "Attention!",
+                                back: null,
+                                settings: true,
+                                refresh: true,
+                            },
+                            ref: createRef()
+                        },
                     },
                     {
                         path: "settings/",
@@ -46,15 +55,18 @@ const router = createBrowserRouter([
                             return {Component: Settings}
                         },
                         handle: {
-                            title: "Settings",
-                            back: {
-                                tooltip: "Home",
-                                url: "/"
+                            appBar: {
+                                title: "Settings",
+                                back: {
+                                    tooltip: "Home",
+                                    url: "/"
+                                },
+                                settings: false,
+                                refresh: false,
                             },
-                            settings: false,
-                            refresh: false
-                        }
-                    }
+                            ref: createRef()
+                        },
+                    },
                 ]
             },
             {
@@ -63,12 +75,18 @@ const router = createBrowserRouter([
                     const {AuthRoot} = await import('./pages/Login')
                     return {Component: AuthRoot}
                 },
+                handle: {
+                    ref: createRef()
+                },
                 children: [
                     {
                         index: true,
                         async lazy () {
                             const {Login} = await import('./pages/Login')
                             return {Component: Login}
+                        },
+                        handle: {
+                            ref: createRef()
                         },
                     },
                     {
@@ -77,12 +95,18 @@ const router = createBrowserRouter([
                             const {CreateAccount} = await import('./pages/Login')
                             return {Component: CreateAccount}
                         },
+                        handle: {
+                            ref: createRef()
+                        },
                     },
                     {
-                        path: "choose-username/"
-                    }
+                        path: "choose-username/",
+                        handle: {
+                            ref: createRef()
+                        },
+                    },
                 ]
-            }
+            },
         ]
     }
 

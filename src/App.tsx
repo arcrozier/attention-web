@@ -183,7 +183,7 @@ export function App() {
 
     const back = useBack()
 
-    const appBarParams = matches.filter((match) => match.handle && 'title' in (match.handle as {}))[0].handle as {title: string, back: null | {title: string, url: string}, refresh: boolean, settings: boolean}
+    const appBarParams = (matches.filter((match) => match.handle && 'appBar' in (match.handle as {}))[0].handle as {appBar: {}}).appBar as {title: string, back: null | {title: string, url: string}, refresh: boolean, settings: boolean}
 
     const backButton = useRef<ReactElement | null>(null)
     useEffect(() => {

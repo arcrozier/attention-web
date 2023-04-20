@@ -1,5 +1,11 @@
-import React, {useEffect, useRef, useState} from "react";
-import {Outlet, useLocation, useNavigate, useOutletContext} from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {
+    useLocation,
+    useMatches,
+    useNavigate,
+    useOutlet,
+    useOutletContext
+} from "react-router-dom";
 import Cookies from "js-cookie";
 import {
     Alert,
@@ -13,6 +19,7 @@ import {
 import {Close} from "@mui/icons-material";
 import {SESSION_ID_COOKIE} from "./utils/defs";
 import {SwitchTransition, CSSTransition} from "react-transition-group";
+import './animations.css'
 
 
 export interface Properties {
@@ -163,7 +170,14 @@ export function Root() {
         </IconButton>
         </a>
 
-    const nodeRef = useRef(null)
+    const matches = useMatches()
+
+    const hasRefs = matches.filter((match) => match.handle && 'ref' in (match.handle as {}))
+
+    const nodeRef = (hasRefs[hasRefs.length - 1].handle as {ref: React.RefObject<any>}).ref
+    const currentOutlet = useOutlet(props)
+
+    console.log(location.pathname)
 
     return (
         <ThemeProvider theme={theme}>
@@ -178,12 +192,14 @@ export function Root() {
                     <CSSTransition
                         key={location.pathname}
                         nodeRef={nodeRef}
-                        timeout={300}
+                        timeout={10000}
                         classNames="page"
                         unmountOnExit={true}>
-                        <div className="page">
-                            <Outlet context={props}/>
-                        </div>
+                        {() => (
+                            <div ref={nodeRef} className="page">
+                                {currentOutlet}
+                            </div>
+                        )}
                     </CSSTransition>
                 </SwitchTransition>
                 {showPrompt && appBtn}
