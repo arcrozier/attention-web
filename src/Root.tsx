@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {
+    Params,
     useLocation,
     useMatches,
     useNavigate,
@@ -20,7 +21,7 @@ import {Close} from "@mui/icons-material";
 import {SESSION_ID_COOKIE} from "./utils/defs";
 import {SwitchTransition, CSSTransition} from "react-transition-group";
 import './animations.css'
-
+import {ROOT_ID} from "./index";
 
 export interface Properties {
     darkMode: boolean,
@@ -52,6 +53,23 @@ export function useBack() {
         }
         navigate(-1)
     }
+}
+
+export interface match {
+    id: string,
+    pathname: string,
+    params: Params<string>,
+    data: unknown,
+    handle: unknown
+}
+
+export function useChild(id: string, matches: match[]): match | null {
+    for (let i = 0; i < matches.length - 1; i++) {
+        if (matches[i].id === id) {
+            return matches[i + 1]
+        }
+    }
+    return null
 }
 
 /**
@@ -166,18 +184,16 @@ export function Root() {
             setShowPrompt(false)
         }
         }>
-            <Close />
+            <Close/>
         </IconButton>
-        </a>
+    </a>
 
     const matches = useMatches()
 
-    const hasRefs = matches.filter((match) => match.handle && 'ref' in (match.handle as {}))
-
-    const nodeRef = (hasRefs[hasRefs.length - 1].handle as {ref: React.RefObject<any>}).ref
     const currentOutlet = useOutlet(props)
+    const child = useChild(ROOT_ID, matches)
 
-    console.log(location.pathname)
+    const nodeRef = child == null ? null : (child.handle as {ref : React.RefObject<any>}).ref
 
     return (
         <ThemeProvider theme={theme}>
@@ -190,7 +206,7 @@ export function Root() {
             }}>
                 <SwitchTransition>
                     <CSSTransition
-                        key={location.pathname}
+                        key={child?.id}
                         nodeRef={nodeRef}
                         timeout={10000}
                         classNames="page"
@@ -204,7 +220,8 @@ export function Root() {
                 </SwitchTransition>
                 {showPrompt && appBtn}
             </div>
-            <Snackbar open={snackbar !== null} onClose={() => setSnackbar(null)} autoHideDuration={snackbar?.autoHideDuration}>
+            <Snackbar open={snackbar !== null} onClose={() => setSnackbar(null)}
+                      autoHideDuration={snackbar?.autoHideDuration}>
                 <Alert onClose={() => setSnackbar(null)} severity={snackbar?.severity}>
                     {snackbar?.message}
                 </Alert>

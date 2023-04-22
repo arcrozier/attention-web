@@ -5,7 +5,7 @@ import {
     Outlet, redirect,
     useLoaderData, useLocation,
     useMatches,
-    useOutletContext
+    useOutletContext, useRouteLoaderData
 } from "react-router-dom";
 import {APIResult, getUserInfo, registerDevice} from "./utils/repository";
 import {Properties, useBack, useLogout, useProps as useRootProps} from "./Root";
@@ -15,6 +15,7 @@ import {getMessaging, getToken} from "firebase/messaging";
 import {AttentionAppBar} from "./utils/AttentionAppBar";
 import {IconButton, Tooltip} from "@mui/material";
 import {ArrowBack} from "@mui/icons-material";
+import {APP_ID} from "./index";
 
 const key = "BD_lSto79pwcXtKhH2BCtvf_KMpm3ut6C1ifTIozgLH054fJigE33tR-fqLHRCm13Oms1BYW9coUpqR3Ca5olxk"
 
@@ -150,15 +151,11 @@ export function notify(title: string, options: NotificationOptions | undefined =
 
 export function App() {
 
-    const userInfo = useLoaderData() as { userInfo: Promise<AxiosResponse<APIResult<UserInfo>>> }
+    const userInfo = useRouteLoaderData(APP_ID) as { userInfo: Promise<AxiosResponse<APIResult<UserInfo>>> }
+
+    const [leaving, setLeaving] = useState(false)
 
     const {darkMode, webApp} = useRootProps()
-
-    const props: AppProperties = {
-        darkMode: darkMode,
-        webApp: webApp,
-        userInfo: userInfo.userInfo
-    }
 
     const [loading, setLoading] = useState(true)
 
@@ -167,50 +164,61 @@ export function App() {
     const location = useLocation()
 
     useEffect(() => {
-        userInfo.userInfo?.then(() => {
-            setLoading(false)
-        }).catch((error: { response: AxiosResponse | undefined | null, request: any }) => {
-            setLoading(false)
-            if (error.response && error.response.status === 403) {
-                logout(true, `${location.pathname}${location.search}`)
-            } else {
-                throw(error)
-            }
-        })
-    }, [userInfo.userInfo, logout, location.pathname, location.search])
+        console.log(userInfo.userInfo, logout, location.pathname, location.search)
+        if (!leaving) {
+            userInfo.userInfo?.then(() => {
+                setLoading(false)
+            }).catch((error: { response: AxiosResponse | undefined | null, request: any }) => {
+                setLoading(false)
+                if (error.response && error.response.status === 403) {
+                    console.error("logging out")
+                    setLeaving(true)
+                    logout(true, `${location.pathname}${location.search}`)
+                } else {
+                    throw(error)
+                }
+            })
+        }
+    }, [userInfo.userInfo, logout, location.pathname, location.search, leaving])
 
     const matches = useMatches()
 
     const back = useBack()
 
+    console.log(matches)
+
     const appBarParams = (matches.filter((match) => match.handle && 'appBar' in (match.handle as {}))[0].handle as {appBar: {}}).appBar as {title: string, back: null | {title: string, url: string}, refresh: boolean, settings: boolean}
 
-    const backButton = useRef<ReactElement | null>(null)
-    useEffect(() => {
-        if (appBarParams.back) {
-            const url = appBarParams.back.url
-            backButton.current = <Tooltip title={appBarParams.back.title}>
-                <IconButton
-                    size="large"
-                    edge="start"
-                    color="inherit"
-                    aria-label="home"
-                    sx={{ mr: 2 }}
-                    onClick={() => {
-                        back(url)
-                    }}
-                >
-                    <ArrowBack />
-                </IconButton>
-            </Tooltip>
-        }
-    }, [appBarParams.back, back])
+    let backButton: ReactElement | null;
+    if (appBarParams.back) {
+        const url = appBarParams.back.url
+        backButton = <Tooltip title={appBarParams.back.title}>
+            <IconButton
+                size="large"
+                edge="start"
+                color="inherit"
+                aria-label="home"
+                sx={{ mr: 2 }}
+                onClick={() => {
+                    back(url)
+                }}
+            >
+                <ArrowBack />
+            </IconButton>
+        </Tooltip>
+    } else {
+        backButton = null
+    }
 
-
+    const props: AppProperties = {
+        darkMode: darkMode,
+        webApp: webApp,
+        userInfo: userInfo.userInfo
+    }
 
     return (
         <div className="App">
-            <AttentionAppBar title={appBarParams.title} back={backButton.current} settings={appBarParams.settings} loading={loading} refresh={appBarParams.refresh}
+            <AttentionAppBar title={appBarParams.title} back={backButton} settings={appBarParams.settings} loading={loading} refresh={appBarParams.refresh}
                              setLoading={(l) => {
                                  setLoading((prevState) => {
                                      return prevState || l
