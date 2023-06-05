@@ -1,11 +1,10 @@
-import React, {ReactElement, useEffect, useRef, useState} from 'react';
+import React, {ReactElement, useEffect, useState} from 'react';
 import './App.css';
 import {
     defer,
     Outlet, redirect,
-    useLoaderData, useLocation,
-    useMatches,
-    useOutletContext, useRouteLoaderData
+    useLocation,
+    useMatches, useOutletContext, useRouteLoaderData
 } from "react-router-dom";
 import {APIResult, getUserInfo, registerDevice} from "./utils/repository";
 import {Properties, useBack, useLogout, useProps as useRootProps} from "./Root";
@@ -16,6 +15,8 @@ import {AttentionAppBar} from "./utils/AttentionAppBar";
 import {IconButton, Tooltip} from "@mui/material";
 import {ArrowBack} from "@mui/icons-material";
 import {APP_ID} from "./index";
+import Cookies from "js-cookie";
+import {SESSION_ID_COOKIE} from "./utils/defs";
 
 const key = "BD_lSto79pwcXtKhH2BCtvf_KMpm3ut6C1ifTIozgLH054fJigE33tR-fqLHRCm13Oms1BYW9coUpqR3Ca5olxk"
 
@@ -153,8 +154,6 @@ export function App() {
 
     const userInfo = useRouteLoaderData(APP_ID) as { userInfo: Promise<AxiosResponse<APIResult<UserInfo>>> }
 
-    const [leaving, setLeaving] = useState(false)
-
     const {darkMode, webApp} = useRootProps()
 
     const [loading, setLoading] = useState(true)
@@ -163,23 +162,23 @@ export function App() {
 
     const location = useLocation()
 
+    if (!Cookies.get(SESSION_ID_COOKIE)) {
+        logout(false, `${location.pathname}${location.search}`)
+    }
+
     useEffect(() => {
-        console.log(userInfo.userInfo, logout, location.pathname, location.search)
-        if (!leaving) {
             userInfo.userInfo?.then(() => {
                 setLoading(false)
-            }).catch((error: { response: AxiosResponse | undefined | null, request: any }) => {
+            }).catch((error: AxiosError) => {
                 setLoading(false)
                 if (error.response && error.response.status === 403) {
                     console.error("logging out")
-                    setLeaving(true)
                     logout(true, `${location.pathname}${location.search}`)
                 } else {
                     throw(error)
                 }
             })
-        }
-    }, [userInfo.userInfo, logout, location.pathname, location.search, leaving])
+    }, [userInfo])
 
     const matches = useMatches()
 

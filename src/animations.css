@@ -28,25 +28,3 @@
     transform: scale(0);
     transition: opacity var(--overlay-duration) ease-in-out, transform var(--overlay-duration) ease-in-out;
 }
-
-.page-enter {
-    opacity: 0;
-    transform: scale(1.1);
-}
-
-.page-enter-active {
-    opacity: 1;
-    transform: scale(1);
-    transition: opacity var(--page-duration), transform var(--page-duration);
-}
-
-.page-exit {
-    opacity: 1;
-    transform: scale(1);
-}
-
-.page-exit-active {
-    opacity: 0;
-    transform: scale(0.9);
-    transition: opacity var(--page-duration), transform var(--page-duration);
-}

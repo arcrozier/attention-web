@@ -2,10 +2,9 @@ import React, {useEffect, useState} from "react";
 import {
     Params,
     useLocation,
-    useMatches,
     useNavigate,
-    useOutlet,
-    useOutletContext
+    useOutletContext,
+    Outlet
 } from "react-router-dom";
 import Cookies from "js-cookie";
 import {
@@ -19,9 +18,7 @@ import {
 } from "@mui/material";
 import {Close} from "@mui/icons-material";
 import {SESSION_ID_COOKIE} from "./utils/defs";
-import {SwitchTransition, CSSTransition} from "react-transition-group";
 import './animations.css'
-import {ROOT_ID} from "./index";
 
 export interface Properties {
     darkMode: boolean,
@@ -58,7 +55,7 @@ export function useBack() {
 export interface match {
     id: string,
     pathname: string,
-    params: Params<string>,
+    params: Params,
     data: unknown,
     handle: unknown
 }
@@ -124,8 +121,7 @@ export function Root() {
     const isWebApp = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
 
     const darkMode = useMediaQuery('(prefers-color-scheme: dark)');
-    const location = useLocation()
-
+    useLocation();
     const theme = React.useMemo(
         () =>
             responsiveFontSizes(createTheme({
@@ -188,13 +184,6 @@ export function Root() {
         </IconButton>
     </a>
 
-    const matches = useMatches()
-
-    const currentOutlet = useOutlet(props)
-    const child = useChild(ROOT_ID, matches)
-
-    const nodeRef = child == null ? null : (child.handle as {ref : React.RefObject<any>}).ref
-
     return (
         <ThemeProvider theme={theme}>
             <div style={{
@@ -204,20 +193,7 @@ export function Root() {
                 backgroundColor: theme.palette.background.default,
                 color: theme.palette.getContrastText(theme.palette.background.default)
             }}>
-                <SwitchTransition>
-                    <CSSTransition
-                        key={child?.id}
-                        nodeRef={nodeRef}
-                        timeout={10000}
-                        classNames="page"
-                        unmountOnExit={true}>
-                        {() => (
-                            <div ref={nodeRef} className="page">
-                                {currentOutlet}
-                            </div>
-                        )}
-                    </CSSTransition>
-                </SwitchTransition>
+                <Outlet context={props}/>
                 {showPrompt && appBtn}
             </div>
             <Snackbar open={snackbar !== null} onClose={() => setSnackbar(null)}
