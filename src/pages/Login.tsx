@@ -445,3 +445,25 @@ export function CreateAccount() {
         </div>
     )
 }
+
+export function ChooseUsername() {
+    // todo
+    /*
+    (<-)
+    Choose Username
+    username
+    [go]
+     */
+}
+
+export function ChangePassword() {
+    // todo
+    /*
+    (<-)
+    Change Password
+    current password
+    new password
+    repeat password
+    [change password]
+     */
+}
