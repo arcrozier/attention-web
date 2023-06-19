@@ -25,4 +25,6 @@ export interface TextFieldStatus {
     message: string,
 }
 
+export const SINGLE_LINE: React.CSSProperties = {textOverflow: "ellipsis", whiteSpace: "nowrap", overflow: "hidden"}
+
 export const DEFAULT_DELAY = 3.5

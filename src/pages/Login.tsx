@@ -79,7 +79,7 @@ export function Login() {
     useEffect(() => {
         if (Cookies.get(SESSION_ID_COOKIE)) {
             checkLogin().then(() => {
-                navigate(location.state.redirect ? location.state.redirect : '/', {replace: true})
+                navigate(location.state && location.state.redirect ? location.state.redirect : '/', {replace: true})
             }).catch((error) => {
                 if (error.response && error.response.status === 403) {
                     logout(false)
@@ -88,7 +88,7 @@ export function Login() {
         } else {
             logout(false)
         }
-    }, [navigate, logout, location.state.redirect])
+    }, [navigate, logout, location.state])
 
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
@@ -111,8 +111,9 @@ export function Login() {
         setLoading(true)
 
         loginPromise.then(() => {
-            navigate(location.state.redirect ? location.state.redirect : '/', {replace: true})
+            navigate(location.state && location.state.redirect ? location.state.redirect : '/', {replace: true})
         }).catch((error) => {
+            console.error(error)
             if (error.response && error.response.status === 403) {
                 setPasswordStatus({error: true, message: 'Invalid username or password'})
             } else {
@@ -147,7 +148,7 @@ export function Login() {
             <div className={"textfield-width"}>
                 <TextField autoComplete={"username"} variant={"outlined"}
                            error={passwordStatus.error} label={"Username"}
-                           onKeyPress={(event) => {
+                           onKeyDown={(event) => {
                                if (event.key === 'Enter') {
                                    doLogin()
                                }
@@ -158,7 +159,7 @@ export function Login() {
                 <div style={{height: LIST_ELEMENT_PADDING}}/>
                 <TextField autoComplete={"current-password"} variant={"outlined"} label={"Password"}
                            error={passwordStatus.error}
-                           onKeyPress={(event) => {
+                           onKeyDown={(event) => {
                                if (event.key === 'Enter') {
                                    doLogin()
                                }
@@ -169,7 +170,7 @@ export function Login() {
                            type={passwordShown ? "text" : "password"} name={"password"}
                            InputProps={{
                                endAdornment: <InputAdornment position="end">
-                                   <IconButton
+                                   <IconButton  onKeyDown={(e) => e.stopPropagation()}
                                        onClick={handleClickShowPassword}
                                    >
                                        {passwordShown ? <Visibility/> : <VisibilityOff/>}
@@ -322,7 +323,7 @@ export function CreateAccount() {
             <div className={"textfield-width"}>
                 <TextField autoComplete={"username"} variant={"outlined"}
                            error={usernameStatus.error} label={"Username"}
-                           onKeyPress={(event) => {
+                           onKeyDown={(event) => {
                                if (event.key === 'Enter') {
                                    doCreateAccount()
                                }
@@ -335,7 +336,7 @@ export function CreateAccount() {
                 <div style={{height: LIST_ELEMENT_PADDING}}/>
                 <TextField autoComplete={"email"} type={"email"} variant={"outlined"}
                            error={emailStatus.error} label={"Email"}
-                           onKeyPress={(event) => {
+                           onKeyDown={(event) => {
                                if (event.key === 'Enter') {
                                    doCreateAccount()
                                }
@@ -349,7 +350,7 @@ export function CreateAccount() {
                 <div style={{height: LIST_ELEMENT_PADDING}}/>
                 <TextField autoComplete={"given-name"} variant={"outlined"} label={"First name"}
                            value={firstName}
-                           onKeyPress={(event) => {
+                           onKeyDown={(event) => {
                                if (event.key === 'Enter') {
                                    doCreateAccount()
                                }
@@ -361,7 +362,7 @@ export function CreateAccount() {
                 <div style={{height: LIST_ELEMENT_PADDING}}/>
                 <TextField autoComplete={"family-name"} variant={"outlined"} label={"Last name"}
                            value={lastName}
-                           onKeyPress={(event) => {
+                           onKeyDown={(event) => {
                                if (event.key === 'Enter') {
                                    doCreateAccount()
                                }
@@ -373,7 +374,7 @@ export function CreateAccount() {
                 <div style={{height: LIST_ELEMENT_PADDING}}/>
                 <TextField autoComplete={"new-password"} variant={"outlined"} label={"Password"}
                            error={passwordStatus.error}
-                           onKeyPress={(event) => {
+                           onKeyDown={(event) => {
                                if (event.key === 'Enter') {
                                    doCreateAccount()
                                }
@@ -385,7 +386,7 @@ export function CreateAccount() {
                            type={passwordShown ? "text" : "password"} name={"password"}
                            InputProps={{
                                endAdornment: <InputAdornment position="end">
-                                   <IconButton
+                                   <IconButton onKeyDown={(e) => e.stopPropagation()}
                                        onClick={handleClickShowPassword}
                                    >
                                        {passwordShown ? <Visibility/> : <VisibilityOff/>}
@@ -398,7 +399,7 @@ export function CreateAccount() {
                 " password"}
                            error={confirmPasswordStatus.error}
                            required={true}
-                           onKeyPress={(event) => {
+                           onKeyDown={(event) => {
                                if (event.key === 'Enter') {
                                    doCreateAccount()
                                }
