@@ -28,3 +28,11 @@
     transform: scale(0);
     transition: opacity var(--overlay-duration) ease-in-out, transform var(--overlay-duration) ease-in-out;
 }
+
+.opacity1 {
+    opacity: 1;
+}
+
+.opacity0 {
+    opacity: 0;
+}

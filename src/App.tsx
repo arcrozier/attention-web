@@ -178,6 +178,7 @@ export function App() {
                     throw(error)
                 }
             })
+        // eslint-disable-next-line
     }, [userInfo])
 
     const matches = useMatches()

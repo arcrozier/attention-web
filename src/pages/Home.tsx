@@ -432,7 +432,7 @@ export function Home() {
     const [queryParams, ] = useSearchParams()
 
     const params = useParams()
-    console.log(params)
+    console.log(params, queryParams)
 
     useTitle(webApp, 'Home')
 
@@ -459,7 +459,7 @@ export function Home() {
 
     return (
         <div className="App">
-            {/* TODO better loading (can we get the loading bar?) and error handling */}
+            {/* TODO when user has an add query param, display dialog */}
             <React.Suspense fallback={null}>
                 <Await resolve={userInfo} errorElement={<div style={{
                     margin: 0,

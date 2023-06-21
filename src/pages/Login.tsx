@@ -34,7 +34,7 @@ declare global {
     }
 }
 
-const useGoogleSignIn = () => {
+const useGoogleSignIn = ()=> {
     useEffect(() => {
         const script = document.createElement('script');
 
@@ -50,7 +50,7 @@ const useGoogleSignIn = () => {
     }, []);
 }
 
-export function AuthRoot() {
+export function AuthRoot(): JSX.Element {
     const props = useProps()
 
     return (
@@ -68,7 +68,7 @@ export function AuthRoot() {
 }
 
 
-export function Login() {
+export function Login(): JSX.Element {
 
     const {webApp, darkMode} = useProps()
 
@@ -210,7 +210,7 @@ export function Login() {
     )
 }
 
-export function CreateAccount() {
+export function CreateAccount(): JSX.Element {
 
     const {webApp, darkMode} = useProps()
     const logout = useLogout()
@@ -447,7 +447,7 @@ export function CreateAccount() {
     )
 }
 
-export function ChooseUsername() {
+export function ChooseUsername(): JSX.Element {
     // todo
     /*
     (<-)
@@ -455,9 +455,12 @@ export function ChooseUsername() {
     username
     [go]
      */
+    return (<div>
+        placeholder
+    </div>)
 }
 
-export function ChangePassword() {
+export function ChangePassword(): JSX.Element {
     // todo
     /*
     (<-)
@@ -467,4 +470,7 @@ export function ChangePassword() {
     repeat password
     [change password]
      */
+    return (<div>
+        placeholder
+    </div>)
 }

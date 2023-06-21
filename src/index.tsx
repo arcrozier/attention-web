@@ -112,6 +112,20 @@ const router = createBrowserRouter([
                     },
                     {
                         path: "choose-username/",
+                        async lazy () {
+                            const {ChooseUsername} = await import('./pages/Login')
+                            return {Component: ChooseUsername}
+                        },
+                        handle: {
+                            ref: createRef()
+                        },
+                    },
+                    {
+                        path: "change-password/",
+                        async lazy () {
+                            const {ChangePassword} = await import('./pages/Login')
+                            return {Component: ChangePassword}
+                        },
                         handle: {
                             ref: createRef()
                         },
