@@ -1,10 +1,11 @@
 import {useTitle} from "../Root";
 import {useProps, UserInfo} from "../App";
-import {LIST_ELEMENT_PADDING, SINGLE_LINE} from "../utils/defs";
+import {LIST_ELEMENT_PADDING, SINGLE_LINE, UnstyledButton} from "../utils/defs";
 import {
     Button,
     ClickAwayListener,
-    Dialog, DialogActions,
+    Dialog,
+    DialogActions,
     DialogContent,
     DialogTitle,
     Paper,
@@ -30,7 +31,7 @@ interface PreferenceProps<T> {
     value: T,
     action?: React.ReactNode,
     summary?: ((value: T) => string) | null,
-    onClick?: () => void,
+    onClick?: (event: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>) => void,
     enabled?: boolean,
     titleColor?: string,
     summaryColor?: string,
@@ -64,7 +65,7 @@ function Preference<T>(props: PreferenceProps<T>) {
 
 
     return (
-        <div style={{
+        <UnstyledButton style={{
             width: "100%",
             height: PREFERENCE_SIZE,
             display: "flex",
@@ -95,7 +96,7 @@ function Preference<T>(props: PreferenceProps<T>) {
                     <Typography variant={"body2"} style={{color: summaryColor, ...SINGLE_LINE}}>{summary}</Typography>}
             </div>
             {props.action}
-        </div>
+        </UnstyledButton>
     )
 }
 
@@ -104,18 +105,20 @@ function DialogPreference<T>(props: DialogPreferenceProps<T>) {
     const [editing, setEditing] = useState(false)
 
     return (
-        <div onClick={(e) => {
-            e.stopPropagation()
-            setEditing((prevState) => {
-                return !prevState;
+        <div>
+            <props.dialog value={props.value} setValue={props.setValue} open={editing} dismissDialog={() => {
+                setEditing(false)
+            }}
+                          title={props.title}/>
+            <Preference {...{
+                ...props, onClick: (e) => {
+                    e.stopPropagation()
+                    setEditing((prevState) => {
+                        return !prevState;
 
-            })
-        }}>
-                <props.dialog value={props.value} setValue={props.setValue} open={editing} dismissDialog={() => {
-                    setEditing(false)
-                }}
-                              title={props.title}/>
-            <Preference {...props}/>
+                    })
+                }
+            }}/>
         </div>
     )
 }
@@ -157,53 +160,56 @@ function ShareButton(props: { text: string }) {
         </ClickAwayListener>
     )
     return (
-        <div onClick={(e) => setAnchorEl(e.currentTarget)} style={{cursor: "pointer", justifyContent: "center", display: "flex", alignItems: "center", height: "100%", width: "100%"}}>
+        <UnstyledButton onClick={(e) => setAnchorEl((prevState) => prevState ? null : e.currentTarget)} style={{
+            cursor: "pointer",
+            justifyContent: "center",
+            display: "flex",
+            alignItems: "center",
+            height: "100%",
+            width: "100%"
+        }}>
             <Share style={{width: ICON_SIZE, height: ICON_SIZE}}/>
             {Boolean(anchorEl) && <MyPopper/>}
-        </div>
+        </UnstyledButton>
     )
 }
 
-function PhotoSelectDialog(props: {onDone: (photo: string) => void, onCancel: () => void}) {
+function PhotoSelectDialog(props: { onDone: (photo: string) => void, onCancel: () => void }) {
     return (<div>
         Not yet implemented
     </div>)
 }
 
 function UsernamePreference(props: { userInfo: Awaited<AxiosResponse<APIResult<UserInfo>>> }) {
-    const {username, photo} = props.userInfo.data.data ? props.userInfo.data.data : {username: "Error: no username found", photo: null}
+    const {
+        username,
+        photo
+    } = props.userInfo.data.data ? props.userInfo.data.data : {username: "Error: no username found", photo: null}
     const [newUsername, setNewUsername] = useState(username)
     const [photoDialog, setPhotoDialog] = useState(false)
 
     const PhotoElement = photo ? () => (
-        <div>
-            {photoDialog && <PhotoSelectDialog onDone={(photo) => {
-                // todo upload photo
-                setPhotoDialog(false)
-            }} onCancel={() => {
-                setPhotoDialog(false)
-            }} />}
-            <img src={`data:image/png;base64,${photo}`}
-                 alt={`Your profile photo - click to set`}
-                 style={{width: "100%", height: "100%"}}
-                 onClick={(e) => {
-                     e.stopPropagation()
-                     console.log("PFP clicked")
-                     setPhotoDialog(true)
-                     // todo open dialog that allows for drag and drop or click
-                 }
-                 }
-            />
-        </div>
+
+        <img src={`data:image/png;base64,${photo}`}
+             alt={`Your profile photo - click to set`}
+             style={{width: "100%", height: "100%"}}
+             onClick={(e) => {
+                 e.stopPropagation()
+                 console.log("PFP clicked")
+                 setPhotoDialog(true)
+                 // todo open dialog that allows for drag and drop or click
+             }
+             }
+        />
 
     ) : () => (
         <AccountCircleOutlined
             style={{width: "100%", height: "100%"}}
             onClick={(e) => {
-            e.stopPropagation()
-            console.log("PFP clicked")
-            setPhotoDialog(true)
-        }}/>
+                e.stopPropagation()
+                console.log("PFP clicked")
+                setPhotoDialog(true)
+            }}/>
     )
     return (<SplitPreference small={
         <ShareButton text={`Add me on Attention! https://attention.aracroproducts.com/app/add?username=${username}`}/>
@@ -251,7 +257,16 @@ function UsernamePreference(props: { userInfo: Awaited<AxiosResponse<APIResult<U
                                                // todo make request with new username
                                            }
                                        } title={"Username"} value={username} icon={
-    <PhotoElement />
+        <UnstyledButton>
+            {photoDialog && <PhotoSelectDialog onDone={(photo) => {
+                // todo upload photo
+                setPhotoDialog(false)
+            }} onCancel={() => {
+                setPhotoDialog(false)
+            }}/>
+            }
+            <PhotoElement/>
+        </UnstyledButton>
     }/>}/>)
 }
 
@@ -306,7 +321,7 @@ export function Settings() {
                         padding: "10px"
                     }}>
                         <PreferenceGroup title={"Account"} first={true}>
-                            <UsernamePreference userInfo={userInfo} />
+                            <UsernamePreference userInfo={userInfo}/>
                             <Preference onClick={() => {
                                 console.log("preference clicked")
                             }} icon={<div style={{height: "100%", width: "100%", backgroundColor: "red"}}/>}

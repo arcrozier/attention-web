@@ -41,6 +41,7 @@ interface FriendCardProps {
 
 
 function FriendCard(props: FriendCardProps) {
+    // todo needs to be made keyboard-accessible
     const {friend, delay, state, setState, setSnackBar} = props;
 
     const overlayDuration = useAnimations() ? 100 : 0

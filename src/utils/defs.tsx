@@ -28,3 +28,21 @@ export interface TextFieldStatus {
 export const SINGLE_LINE: React.CSSProperties = {textOverflow: "ellipsis", whiteSpace: "nowrap", overflow: "hidden"}
 
 export const DEFAULT_DELAY = 3.5
+
+interface ButtonProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
+    onClick?: (event: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>) => void
+}
+
+export function UnstyledButton(props: ButtonProps) {
+    console.log(props)
+    return (<div {...{
+        role: "button", onKeyDown: (e) => {
+            if ((e.key === "Enter" || e.key === " ")) {
+                e.preventDefault()
+                if (props.onClick) props.onClick(e)
+            }
+        }, tabIndex: 0, ...props
+    }}>
+        {props.children}
+    </div>)
+}
