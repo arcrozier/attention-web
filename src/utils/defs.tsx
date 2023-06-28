@@ -1,4 +1,7 @@
-import React from "react";
+import React, {LegacyRef, RefObject, useState} from "react";
+import {Button, ButtonBase, styled, useTheme} from "@mui/material";
+import Color from "color";
+import {useProps} from "../Root";
 
 export const LIST_ELEMENT_PADDING = "8pt"
 export const SESSION_ID_COOKIE = "sessionid"
@@ -29,20 +32,23 @@ export const SINGLE_LINE: React.CSSProperties = {textOverflow: "ellipsis", white
 
 export const DEFAULT_DELAY = 3.5
 
-interface ButtonProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
-    onClick?: (event: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>) => void
+interface ButtonProps extends React.DetailedHTMLProps<React.HTMLAttributes<any>, any> {
+    onClick?: (event: React.MouseEvent<any> | React.KeyboardEvent<any>) => void,
+    ref?: ((instance: HTMLButtonElement | null) => void) | RefObject<HTMLButtonElement> | null | undefined
 }
 
 export function UnstyledButton(props: ButtonProps) {
-    console.log(props)
-    return (<div {...{
-        role: "button", onKeyDown: (e) => {
+    const [focused, setFocused] = useState(false)
+    const theme = useTheme()
+
+    return (<ButtonBase {...{component: "div",
+        role: "button", onKeyDown: (e: React.KeyboardEvent) => {
             if ((e.key === "Enter" || e.key === " ")) {
                 e.preventDefault()
                 if (props.onClick) props.onClick(e)
             }
-        }, tabIndex: 0, ...props
+        }, tabIndex: 0, focusRipple: true, ...props,
     }}>
         {props.children}
-    </div>)
+    </ButtonBase>)
 }
