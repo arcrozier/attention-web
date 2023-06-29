@@ -4,26 +4,27 @@ import {LIST_ELEMENT_PADDING, SINGLE_LINE, UnstyledButton} from "../utils/defs";
 import {
     Box,
     Button,
-    ClickAwayListener, Collapse,
+    ClickAwayListener,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
-    Fade, IconButton, InputAdornment,
-    Paper,
-    Popper, styled,
+    Fade,
+    IconButton,
+    InputAdornment,
+    Popper,
     TextField,
     Typography,
     useTheme
 } from "@mui/material";
 import Color from "color"
-import React, {createRef, useMemo, useRef, useState} from "react";
+import React, {useMemo, useRef, useState} from "react";
 import {Await} from "react-router-dom";
 import '../animations.css'
 import {AxiosResponse} from "axios";
 import {APIResult} from "../utils/repository";
 import {AccountCircleOutlined, Check, ContentCopy, Share} from "@mui/icons-material";
-import {CSSTransition, SwitchTransition, Transition} from "react-transition-group";
+import {SwitchTransition, Transition} from "react-transition-group";
 
 const ICON_SIZE = "40px"
 const PREFERENCE_SIZE = "72px"
@@ -161,9 +162,7 @@ function ShareButton(props: { text: string }) {
     const copy = () => {
         navigator.clipboard.writeText(props.text).then(() => {
             setCopied(true)
-            console.log("copied")
             setTimeout(() => {
-                console.log("switching back")
                 setCopied(false)
             }, copyHoldDuration)
         })
@@ -173,7 +172,6 @@ function ShareButton(props: { text: string }) {
         setAnchorEl(event.currentTarget)
         event.stopPropagation()
         setOpen((previousOpen) => {
-            console.log("setting open")
             if (!previousOpen) {
                 // we're opening the popup
                 copy()
@@ -186,30 +184,45 @@ function ShareButton(props: { text: string }) {
     const copyRef = React.useRef<null | HTMLDivElement>(null)
     const nodeRef = copied ? copyRef : checkRef
 
-    console.log(copied)
+    const buttonRef = React.useRef<null | HTMLButtonElement>(null)
 
     return (
         <div style={{
-                    height: "100%",
-                    width: "100%"}}>
-            <UnstyledButton aria-describedby={id} onClick={handleClick} style={{
-                        cursor: "pointer",
-                        justifyContent: "center",
-                        display: "flex",
-                        alignItems: "center",
-                        height: "100%",
-                        width: "100%"
-                    }}>
-                <Share style={{width: ICON_SIZE, height: ICON_SIZE}} />
+            height: "100%",
+            width: "100%"
+        }} onKeyDown={(e) => {
+            if (e.key === "Escape") {
+                setOpen(false)
+                if (buttonRef.current) {
+                    buttonRef.current?.focus()
+                }
+            }
+        }}>
+            <UnstyledButton ref={buttonRef} id={"share-button"} aria-describedby={id} onClick={handleClick} style={{
+                cursor: "pointer",
+                justifyContent: "center",
+                display: "flex",
+                alignItems: "center",
+                height: "100%",
+                width: "100%"
+            }}>
+                <Share style={{width: ICON_SIZE, height: ICON_SIZE}}/>
             </UnstyledButton>
             <ClickAwayListener onClickAway={() => {
                 setOpen(false)
                 console.log("Clicked away")
             }} mouseEvent={open ? 'onClick' : false} touchEvent={open ? 'onTouchEnd' : false}>
                 <Popper id={id} open={open} anchorEl={anchorEl} placement={'top'} transition>
-                    {({ TransitionProps }) => (
-                        <Fade {...TransitionProps /* Wanted to use Collapse but there's a bug https://github.com/mui/material-ui/issues/11337 */}  timeout={350}>
-                            <Box sx={{ border: 1, borderRadius: "5px", p: 1, bgcolor: 'background.paper', color: theme.palette.getContrastText(theme.palette.background.paper) }}>
+                    {({TransitionProps}) => (
+                        <Fade {...TransitionProps /* Wanted to use Collapse but there's a bug https://github.com/mui/material-ui/issues/11337 */}
+                              timeout={350}>
+                            <Box sx={{
+                                border: 1,
+                                borderRadius: "5px",
+                                p: 1,
+                                bgcolor: 'background.paper',
+                                color: theme.palette.getContrastText(theme.palette.background.paper)
+                            }}>
                                 <div style={{display: "flex", flexDirection: "row"}}>
                                     <TextField value={props.text} autoFocus={true} InputProps={{
                                         endAdornment: <InputAdornment position={"end"}>
@@ -226,7 +239,7 @@ function ShareButton(props: { text: string }) {
                                                         display: state === "exited" ? "none" : "block"
                                                     }}>
                                                         <IconButton onClick={copy}>
-                                                            {copied ? <Check color={"success"}/> : <ContentCopy />}
+                                                            {copied ? <Check color={"success"}/> : <ContentCopy/>}
 
                                                         </IconButton>
                                                     </div>}
@@ -234,12 +247,17 @@ function ShareButton(props: { text: string }) {
                                             </SwitchTransition>
                                         </InputAdornment>
                                     }}/>
+                                    <IconButton onClick={() => {
+                                        navigator.share({text: props.text})
+                                    }}>
+                                        <Share/>
+                                    </IconButton>
                                 </div>
                             </Box>
                         </Fade>
                     )}
                 </Popper>
-        </ClickAwayListener>
+            </ClickAwayListener>
 
         </div>
     )
