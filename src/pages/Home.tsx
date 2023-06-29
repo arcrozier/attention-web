@@ -461,6 +461,7 @@ export function Home() {
     return (
         <div className="App">
             {/* TODO when user has an add query param, display dialog */}
+            {/* TODO add animation when loading */}
             <React.Suspense fallback={null}>
                 <Await resolve={userInfo} errorElement={<div style={{
                     margin: 0,

@@ -1,4 +1,4 @@
-import React, {LegacyRef, RefObject, useState} from "react";
+import React, {ForwardedRef, forwardRef, LegacyRef, RefObject, useState} from "react";
 import {Button, ButtonBase, styled, useTheme} from "@mui/material";
 import Color from "color";
 import {useProps} from "../Root";
@@ -34,10 +34,10 @@ export const DEFAULT_DELAY = 3.5
 
 interface ButtonProps extends React.DetailedHTMLProps<React.HTMLAttributes<any>, any> {
     onClick?: (event: React.MouseEvent<any> | React.KeyboardEvent<any>) => void,
-    ref?: ((instance: HTMLButtonElement | null) => void) | RefObject<HTMLButtonElement> | null | undefined
+    ref?: undefined
 }
 
-export function UnstyledButton(props: ButtonProps) {
+export const UnstyledButton = forwardRef(function UnstyledButton(props: ButtonProps, ref?: ForwardedRef<HTMLButtonElement> | null | undefined){
     const [focused, setFocused] = useState(false)
     const theme = useTheme()
 
@@ -47,8 +47,8 @@ export function UnstyledButton(props: ButtonProps) {
                 e.preventDefault()
                 if (props.onClick) props.onClick(e)
             }
-        }, tabIndex: 0, focusRipple: true, ...props,
+        }, tabIndex: 0, focusRipple: true, ...props, ref: ref
     }}>
         {props.children}
     </ButtonBase>)
-}
+})

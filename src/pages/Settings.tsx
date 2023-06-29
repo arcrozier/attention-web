@@ -2,25 +2,28 @@ import {useTitle} from "../Root";
 import {useProps, UserInfo} from "../App";
 import {LIST_ELEMENT_PADDING, SINGLE_LINE, UnstyledButton} from "../utils/defs";
 import {
+    Box,
     Button,
-    ClickAwayListener,
+    ClickAwayListener, Collapse,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
+    Fade, IconButton, InputAdornment,
     Paper,
-    Popper,
+    Popper, styled,
     TextField,
     Typography,
     useTheme
 } from "@mui/material";
 import Color from "color"
-import React, {useMemo, useRef, useState} from "react";
+import React, {createRef, useMemo, useRef, useState} from "react";
 import {Await} from "react-router-dom";
 import '../animations.css'
 import {AxiosResponse} from "axios";
 import {APIResult} from "../utils/repository";
-import {AccountCircleOutlined, Share} from "@mui/icons-material";
+import {AccountCircleOutlined, Check, ContentCopy, Share} from "@mui/icons-material";
+import {CSSTransition, SwitchTransition, Transition} from "react-transition-group";
 
 const ICON_SIZE = "40px"
 const PREFERENCE_SIZE = "72px"
@@ -147,30 +150,98 @@ function SplitPreference(props: { small: React.ReactNode, large: React.ReactNode
 
 function ShareButton(props: { text: string }) {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [open, setOpen] = useState(false)
+    const theme = useTheme()
+    const id = open && Boolean(anchorEl) ? 'transition-popper' : undefined
+    const [copied, setCopied] = useState(false)
 
-    // todo animation
-    const MyPopper = () => (
-        <ClickAwayListener onClickAway={(e) => {
-            setAnchorEl(null)
-            e.stopPropagation()
-        }}>
-            <Popper open={Boolean(anchorEl)} anchorEl={anchorEl}>
-                <Paper className="popper">{props.text}</Paper>
-            </Popper>
-        </ClickAwayListener>
-    )
+    const copyAnimationDuration = 250
+    const copyHoldDuration = 3 * 1000 // 3 seconds (3000 ms)
+
+    const copy = () => {
+        navigator.clipboard.writeText(props.text).then(() => {
+            setCopied(true)
+            console.log("copied")
+            setTimeout(() => {
+                console.log("switching back")
+                setCopied(false)
+            }, copyHoldDuration)
+        })
+    }
+
+    const handleClick = (event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget)
+        event.stopPropagation()
+        setOpen((previousOpen) => {
+            console.log("setting open")
+            if (!previousOpen) {
+                // we're opening the popup
+                copy()
+            }
+            return !previousOpen
+        })
+    };
+
+    const checkRef = React.useRef<null | HTMLDivElement>(null)
+    const copyRef = React.useRef<null | HTMLDivElement>(null)
+    const nodeRef = copied ? copyRef : checkRef
+
+    console.log(copied)
+
     return (
-        <UnstyledButton onClick={(e) => setAnchorEl((prevState) => prevState ? null : e.currentTarget)} style={{
-            cursor: "pointer",
-            justifyContent: "center",
-            display: "flex",
-            alignItems: "center",
-            height: "100%",
-            width: "100%"
-        }}>
-            <Share style={{width: ICON_SIZE, height: ICON_SIZE}}/>
-            {Boolean(anchorEl) && <MyPopper/>}
-        </UnstyledButton>
+        <div style={{
+                    height: "100%",
+                    width: "100%"}}>
+            <UnstyledButton aria-describedby={id} onClick={handleClick} style={{
+                        cursor: "pointer",
+                        justifyContent: "center",
+                        display: "flex",
+                        alignItems: "center",
+                        height: "100%",
+                        width: "100%"
+                    }}>
+                <Share style={{width: ICON_SIZE, height: ICON_SIZE}} />
+            </UnstyledButton>
+            <ClickAwayListener onClickAway={() => {
+                setOpen(false)
+                console.log("Clicked away")
+            }} mouseEvent={open ? 'onClick' : false} touchEvent={open ? 'onTouchEnd' : false}>
+                <Popper id={id} open={open} anchorEl={anchorEl} placement={'top'} transition>
+                    {({ TransitionProps }) => (
+                        <Fade {...TransitionProps /* Wanted to use Collapse but there's a bug https://github.com/mui/material-ui/issues/11337 */}  timeout={350}>
+                            <Box sx={{ border: 1, borderRadius: "5px", p: 1, bgcolor: 'background.paper', color: theme.palette.getContrastText(theme.palette.background.paper) }}>
+                                <div style={{display: "flex", flexDirection: "row"}}>
+                                    <TextField value={props.text} autoFocus={true} InputProps={{
+                                        endAdornment: <InputAdornment position={"end"}>
+                                            <SwitchTransition mode={'out-in'}>
+                                                <Transition key={copied ? "bar" : "foo"}
+                                                            timeout={copyAnimationDuration}
+                                                            unmountOnExit
+                                                            mountOnEnter
+                                                            nodeRef={nodeRef}
+                                                >
+                                                    {state => <div ref={nodeRef} style={{
+                                                        transition: `${copyAnimationDuration}ms`,
+                                                        opacity: state === "entered" ? 1 : 0,
+                                                        display: state === "exited" ? "none" : "block"
+                                                    }}>
+                                                        <IconButton onClick={copy}>
+                                                            {copied ? <Check color={"success"}/> : <ContentCopy />}
+
+                                                        </IconButton>
+                                                    </div>}
+                                                </Transition>
+                                            </SwitchTransition>
+                                        </InputAdornment>
+                                    }}/>
+                                </div>
+                            </Box>
+                        </Fade>
+                    )}
+                </Popper>
+        </ClickAwayListener>
+
+        </div>
     )
 }
 
