@@ -198,16 +198,12 @@ function ShareButton(props: { text: string }) {
                 }
             }
         }}>
-            <UnstyledButton ref={buttonRef} id={"share-button"} aria-describedby={id} onClick={handleClick} style={{
-                cursor: "pointer",
-                justifyContent: "center",
-                display: "flex",
-                alignItems: "center",
+            <IconButton ref={buttonRef} onClick={handleClick} style={{
                 height: "100%",
                 width: "100%"
             }}>
                 <Share style={{width: ICON_SIZE, height: ICON_SIZE}}/>
-            </UnstyledButton>
+            </IconButton>
             <ClickAwayListener onClickAway={() => {
                 setOpen(false)
                 console.log("Clicked away")
@@ -281,24 +277,14 @@ function UsernamePreference(props: { userInfo: Awaited<AxiosResponse<APIResult<U
 
         <img src={`data:image/png;base64,${photo}`}
              alt={`Your profile photo - click to set`}
-             style={{width: "100%", height: "100%"}}
-             onClick={(e) => {
-                 e.stopPropagation()
-                 console.log("PFP clicked")
-                 setPhotoDialog(true)
-                 // todo open dialog that allows for drag and drop or click
-             }
-             }
+             style={{width: "100%", height: "100%", borderRadius: "50%"}}
+
         />
 
     ) : () => (
         <AccountCircleOutlined
             style={{width: "100%", height: "100%"}}
-            onClick={(e) => {
-                e.stopPropagation()
-                console.log("PFP clicked")
-                setPhotoDialog(true)
-            }}/>
+            />
     )
     return (<SplitPreference small={
         <ShareButton text={`Add me on Attention! https://attention.aracroproducts.com/app/add?username=${username}`}/>
@@ -346,16 +332,29 @@ function UsernamePreference(props: { userInfo: Awaited<AxiosResponse<APIResult<U
                                                // todo make request with new username
                                            }
                                        } title={"Username"} value={username} icon={
-        <UnstyledButton>
+        <div>
+            <IconButton style={{height: "100%", width: "100%", padding: 0}} onClick={(e) => {
+                e.stopPropagation()
+                console.log("PFP clicked")
+                setPhotoDialog(true)
+                // todo open dialog that allows for drag and drop or click
+            }
+            }>
+
+                <PhotoElement/>
+            </IconButton>
             {photoDialog && <PhotoSelectDialog onDone={(photo) => {
                 // todo upload photo
+                // see: https://www.npmjs.com/package/react-dropzone (will need some styling)
+                // And this: https://www.npmjs.com/package/react-image-crop
+                //  or this: https://www.npmjs.com/package/react-cropper
                 setPhotoDialog(false)
             }} onCancel={() => {
                 setPhotoDialog(false)
             }}/>
             }
-            <PhotoElement/>
-        </UnstyledButton>
+        </div>
+
     }/>}/>)
 }
 

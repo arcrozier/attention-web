@@ -1,7 +1,5 @@
-import React, {ForwardedRef, forwardRef, LegacyRef, RefObject, useState} from "react";
-import {Button, ButtonBase, styled, useTheme} from "@mui/material";
-import Color from "color";
-import {useProps} from "../Root";
+import React, {ForwardedRef, forwardRef} from "react";
+import {ButtonBase} from "@mui/material";
 
 export const LIST_ELEMENT_PADDING = "8pt"
 export const SESSION_ID_COOKIE = "sessionid"
@@ -37,11 +35,10 @@ interface ButtonProps extends React.DetailedHTMLProps<React.HTMLAttributes<any>,
     ref?: undefined
 }
 
-export const UnstyledButton = forwardRef(function UnstyledButton(props: ButtonProps, ref?: ForwardedRef<HTMLButtonElement> | null | undefined){
-    const [focused, setFocused] = useState(false)
-    const theme = useTheme()
+export const UnstyledButton = forwardRef(function UnstyledButton(props: ButtonProps, ref?: ForwardedRef<HTMLButtonElement> | null | undefined) {
 
-    return (<ButtonBase {...{component: "div",
+    return (<ButtonBase {...{
+        component: "div",
         role: "button", onKeyDown: (e: React.KeyboardEvent) => {
             if ((e.key === "Enter" || e.key === " ")) {
                 e.preventDefault()
