@@ -345,6 +345,7 @@ function UsernamePreference(props: { userInfo: Awaited<AxiosResponse<APIResult<U
             </IconButton>
             {photoDialog && <PhotoSelectDialog onDone={(photo) => {
                 // todo upload photo
+                // and honestly this should have async imports
                 // see: https://www.npmjs.com/package/react-dropzone (will need some styling)
                 // And this: https://www.npmjs.com/package/react-image-crop
                 //  or this: https://www.npmjs.com/package/react-cropper
