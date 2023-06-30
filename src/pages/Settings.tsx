@@ -260,6 +260,11 @@ function ShareButton(props: { text: string }) {
 }
 
 function PhotoSelectDialog(props: { onDone: (photo: string) => void, onCancel: () => void }) {
+    // todo open dialog that allows for drag and drop or click
+    // and honestly this should have async imports
+    // see: https://www.npmjs.com/package/react-dropzone (will need some styling)
+    // And this: https://www.npmjs.com/package/react-image-crop
+    //  or this: https://www.npmjs.com/package/react-cropper
     return (<div>
         Not yet implemented
     </div>)
@@ -337,7 +342,6 @@ function UsernamePreference(props: { userInfo: Awaited<AxiosResponse<APIResult<U
                 e.stopPropagation()
                 console.log("PFP clicked")
                 setPhotoDialog(true)
-                // todo open dialog that allows for drag and drop or click
             }
             }>
 
@@ -345,10 +349,6 @@ function UsernamePreference(props: { userInfo: Awaited<AxiosResponse<APIResult<U
             </IconButton>
             {photoDialog && <PhotoSelectDialog onDone={(photo) => {
                 // todo upload photo
-                // and honestly this should have async imports
-                // see: https://www.npmjs.com/package/react-dropzone (will need some styling)
-                // And this: https://www.npmjs.com/package/react-image-crop
-                //  or this: https://www.npmjs.com/package/react-cropper
                 setPhotoDialog(false)
             }} onCancel={() => {
                 setPhotoDialog(false)
