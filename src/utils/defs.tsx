@@ -1,5 +1,5 @@
-import React, {ForwardedRef, forwardRef} from "react";
-import {alpha, ButtonBase, styled, Theme} from "@mui/material";
+import React from "react";
+import {alpha, ButtonBase, styled} from "@mui/material";
 
 export const LIST_ELEMENT_PADDING = "8pt"
 export const SESSION_ID_COOKIE = "sessionid"
@@ -35,10 +35,7 @@ interface ButtonProps extends React.DetailedHTMLProps<React.HTMLAttributes<any>,
     ref?: undefined,
 }
 
-export const UnstyledButton = styled(ButtonBase, {
-    shouldForwardProp: () => true,
-    overridesResolver: (props, styles) => props.label
-})<ButtonProps>(({theme, ...props}) => {
+export const UnstyledButton = styled(ButtonBase)<ButtonProps>(({theme}) => {
     return {
         alignItems: 'start',
         textAlign: 'start',

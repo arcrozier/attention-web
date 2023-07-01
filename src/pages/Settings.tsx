@@ -18,7 +18,7 @@ import {
     useTheme
 } from "@mui/material";
 import Color from "color"
-import React, {createRef, lazy, Suspense, useCallback, useMemo, useRef, useState} from "react";
+import React, {createRef, lazy, Suspense, useMemo, useRef, useState} from "react";
 import {Await} from "react-router-dom";
 import '../animations.css'
 import {AxiosResponse} from "axios";
