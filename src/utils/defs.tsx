@@ -1,5 +1,5 @@
 import React, {ForwardedRef, forwardRef} from "react";
-import {ButtonBase} from "@mui/material";
+import {alpha, ButtonBase, styled, Theme} from "@mui/material";
 
 export const LIST_ELEMENT_PADDING = "8pt"
 export const SESSION_ID_COOKIE = "sessionid"
@@ -32,20 +32,29 @@ export const DEFAULT_DELAY = 3.5
 
 interface ButtonProps extends React.DetailedHTMLProps<React.HTMLAttributes<any>, any> {
     onClick?: (event: React.MouseEvent<any> | React.KeyboardEvent<any>) => void,
-    ref?: undefined
+    ref?: undefined,
 }
 
-export const UnstyledButton = forwardRef(function UnstyledButton(props: ButtonProps, ref?: ForwardedRef<HTMLButtonElement> | null | undefined) {
-
-    return (<ButtonBase {...{
-        component: "div",
-        role: "button", onKeyDown: (e: React.KeyboardEvent) => {
-            if ((e.key === "Enter" || e.key === " ")) {
-                e.preventDefault()
-                if (props.onClick) props.onClick(e)
-            }
-        }, tabIndex: 0, focusRipple: true, ...props, ref: ref
-    }}>
-        {props.children}
-    </ButtonBase>)
-})
+export const UnstyledButton = styled(ButtonBase, {
+    shouldForwardProp: () => true,
+    overridesResolver: (props, styles) => props.label
+})<ButtonProps>(({theme, ...props}) => {
+    return {
+        alignItems: 'start',
+        textAlign: 'start',
+        transition: theme.transitions.create(
+            ['background-color', 'box-shadow', 'border-color', 'color'],
+            {
+                duration: theme.transitions.duration.short,
+            },
+        ),
+        '&:hover': {
+            textDecoration: 'none',
+            backgroundColor:
+                alpha(theme.palette.text.primary, theme.palette.action.hoverOpacity),
+            // Reset on touch devices, it doesn't add specificity
+            '@media (hover: none)': {
+                backgroundColor: 'transparent',
+            },
+    }
+}})
