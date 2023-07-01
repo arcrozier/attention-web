@@ -3,7 +3,7 @@ import {useProps, UserInfo} from "../App";
 import {LIST_ELEMENT_PADDING, SINGLE_LINE, UnstyledButton} from "../utils/defs";
 import {
     Box,
-    Button,
+    Button, CircularProgress,
     ClickAwayListener,
     Dialog,
     DialogActions,
@@ -18,13 +18,14 @@ import {
     useTheme
 } from "@mui/material";
 import Color from "color"
-import React, {useMemo, useRef, useState} from "react";
+import React, {createRef, lazy, Suspense, useCallback, useMemo, useRef, useState} from "react";
 import {Await} from "react-router-dom";
 import '../animations.css'
 import {AxiosResponse} from "axios";
 import {APIResult} from "../utils/repository";
 import {AccountCircleOutlined, Check, ContentCopy, Share} from "@mui/icons-material";
 import {SwitchTransition, Transition} from "react-transition-group";
+import {ReactCropperElement} from "react-cropper";
 
 const ICON_SIZE = "40px"
 const PREFERENCE_SIZE = "72px"
@@ -35,7 +36,7 @@ interface PreferenceProps<T> {
     value: T,
     action?: React.ReactNode,
     summary?: ((value: T) => string) | null,
-    onClick?: (event: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>) => void,
+    onClick?: (event: React.MouseEvent<any> | React.KeyboardEvent<any>) => void,
     enabled?: boolean,
     titleColor?: string,
     summaryColor?: string,
@@ -259,15 +260,38 @@ function ShareButton(props: { text: string }) {
     )
 }
 
-function PhotoSelectDialog(props: { onDone: (photo: string) => void, onCancel: () => void }) {
+function PhotoSelectDialog(props: { onDone: (photo: string) => void, onCancel: () => void, open: boolean }) {
     // todo open dialog that allows for drag and drop or click
     // and honestly this should have async imports
     // see: https://www.npmjs.com/package/react-dropzone (will need some styling)
-    // And this: https://www.npmjs.com/package/react-image-crop
-    //  or this: https://www.npmjs.com/package/react-cropper
-    return (<div>
-        Not yet implemented
-    </div>)
+    //  and this: https://www.npmjs.com/package/react-cropper
+    const PhotoUploadFlow = lazy(() => import('../utils/PhotoUploadFlow'))
+    const cropRef = createRef<ReactCropperElement>()
+    const [error, setError] = useState("")
+
+    // on ok clicked, call this
+    const doCrop = () => {
+        if (cropRef.current?.cropper) {
+            props.onDone(cropRef.current?.cropper.getCroppedCanvas().toDataURL());
+        } else {
+            setError("Select a photo")
+        }
+    }
+
+    return (
+        <Dialog open={props.open}>
+            <DialogTitle>Upload photo</DialogTitle>
+            <DialogContent>
+                {Boolean(error) && <Typography variant={'subtitle1'} color={'error'}>{error}</Typography>}
+                <Suspense fallback={<CircularProgress />}>
+                    <PhotoUploadFlow innerRef={cropRef}/>
+                </Suspense>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={props.onCancel}>Cancel</Button>
+                <Button variant={"contained"} onClick={doCrop}>OK</Button>
+            </DialogActions>
+    </Dialog>)
 }
 
 function UsernamePreference(props: { userInfo: Awaited<AxiosResponse<APIResult<UserInfo>>> }) {
@@ -347,13 +371,12 @@ function UsernamePreference(props: { userInfo: Awaited<AxiosResponse<APIResult<U
 
                 <PhotoElement/>
             </IconButton>
-            {photoDialog && <PhotoSelectDialog onDone={(photo) => {
+            <PhotoSelectDialog onDone={(photo) => {
                 // todo upload photo
                 setPhotoDialog(false)
             }} onCancel={() => {
                 setPhotoDialog(false)
-            }}/>
-            }
+            }} open={photoDialog}/>
         </div>
 
     }/>}/>)
