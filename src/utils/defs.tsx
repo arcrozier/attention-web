@@ -1,5 +1,5 @@
 import React from "react";
-import {alpha, ButtonBase, styled} from "@mui/material";
+import {alpha, ButtonBase, ButtonBaseProps, styled} from "@mui/material";
 
 export const LIST_ELEMENT_PADDING = "8pt"
 export const SESSION_ID_COOKIE = "sessionid"
@@ -30,12 +30,12 @@ export const SINGLE_LINE: React.CSSProperties = {textOverflow: "ellipsis", white
 
 export const DEFAULT_DELAY = 3.5
 
-interface ButtonProps extends React.DetailedHTMLProps<React.HTMLAttributes<any>, any> {
+interface ButtonProps extends ButtonBaseProps {
     onClick?: (event: React.MouseEvent<any> | React.KeyboardEvent<any>) => void,
     ref?: undefined,
 }
 
-export const UnstyledButton = styled(ButtonBase)<ButtonProps>(({theme}) => {
+const MUnstyledButton = styled(ButtonBase)<ButtonProps>(({theme}) => {
     return {
         alignItems: 'start',
         textAlign: 'start',
@@ -55,3 +55,9 @@ export const UnstyledButton = styled(ButtonBase)<ButtonProps>(({theme}) => {
             },
     }
 }})
+
+export const UnstyledButton = ({focusRipple, ...props}: ButtonProps) => {
+    return (
+        <MUnstyledButton focusRipple={focusRipple !== undefined ? focusRipple : true} {...props}>{props.children}</MUnstyledButton>
+    )
+}
