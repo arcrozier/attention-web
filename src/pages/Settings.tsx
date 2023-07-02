@@ -1,6 +1,6 @@
 import {useTitle} from "../Root";
 import {useProps, UserInfo} from "../App";
-import {LIST_ELEMENT_PADDING, SINGLE_LINE, UnstyledButton} from "../utils/defs";
+import {filterUsername, LIST_ELEMENT_PADDING, SINGLE_LINE, UnstyledButton} from "../utils/defs";
 import {
     Box,
     Button, CircularProgress,
@@ -358,7 +358,7 @@ function UsernamePreference(props: { userInfo: Awaited<AxiosResponse<APIResult<U
     }
                                        setValue={
                                            (newValue) => {
-                                               // todo make request with new username
+                                               setNewUsername(filterUsername(newValue))
                                            }
                                        } title={"Username"} value={username} icon={
         <div>

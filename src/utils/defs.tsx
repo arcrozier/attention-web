@@ -5,7 +5,11 @@ export const LIST_ELEMENT_PADDING = "8pt"
 export const SESSION_ID_COOKIE = "sessionid"
 
 export const usernameChanged = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    const filtered = event.target.value.replaceAll(/[^a-zA-Z0-9@_\-+.]/gm, '')
+    return filterUsername(event.target.value)
+}
+
+export const filterUsername = (candidate: string): string => {
+    const filtered = candidate.replaceAll(/[^a-zA-Z0-9@_\-+.]/gm, '')
     return filtered.substring(0, 150)
 }
 
