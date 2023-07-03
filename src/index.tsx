@@ -1,7 +1,7 @@
 import React, {createRef, Suspense} from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import './animations.css';
+import './css/index.css';
+import './css/animations.css';
 import reportWebVitals from './reportWebVitals';
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import '@fontsource/roboto/300.css';

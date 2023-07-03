@@ -439,7 +439,7 @@ export function Home() {
 
     const [cardState, setCardState] = useState(new Map())
 
-    const friends = (userInfo: UserInfo | null): JSX.Element[] => {
+    const friends = (userInfo: UserInfo | null) => {
         return userInfo == null ? [] : userInfo.friends.map((value) =>
             <li key={value.friend} style={{listStyle: "none"}}>
                 <FriendCard friend={value}

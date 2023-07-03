@@ -3,7 +3,7 @@ import {AxiosError} from "axios";
 import React, {useEffect} from "react";
 import {Button, createTheme, responsiveFontSizes, useMediaQuery} from "@mui/material";
 import {useLogout} from "../Root";
-import '../ErrorPage.css'
+import '../css/ErrorPage.css'
 
 export function ErrorPage() {
     const error = useRouteError() as any;

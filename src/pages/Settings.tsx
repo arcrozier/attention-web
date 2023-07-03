@@ -18,14 +18,14 @@ import {
     useTheme
 } from "@mui/material";
 import Color from "color"
-import React, {createRef, lazy, Suspense, useMemo, useRef, useState} from "react";
+import React, {createRef, lazy, Suspense, useEffect, useMemo, useRef, useState} from "react";
 import {Await} from "react-router-dom";
-import '../animations.css'
+import '../css/animations.css'
 import {AxiosResponse} from "axios";
 import {APIResult} from "../utils/repository";
 import {AccountCircleOutlined, Check, ContentCopy, Share} from "@mui/icons-material";
 import {SwitchTransition, Transition} from "react-transition-group";
-import {ReactCropperElement} from "react-cropper";
+import {PixelCrop} from "react-image-crop";
 
 const ICON_SIZE = "40px"
 const PREFERENCE_SIZE = "72px"
@@ -118,6 +118,7 @@ function DialogPreference<T>(props: DialogPreferenceProps<T>) {
             <Preference {...{
                 ...props, onClick: (e) => {
                     e.stopPropagation()
+                    console.log("Opening dialog")
                     setEditing((prevState) => {
                         return !prevState;
 
@@ -261,30 +262,79 @@ function ShareButton(props: { text: string }) {
 }
 
 function PhotoSelectDialog(props: { onDone: (photo: string) => void, onCancel: () => void, open: boolean }) {
-    // todo open dialog that allows for drag and drop or click
-    // and honestly this should have async imports
-    // see: https://www.npmjs.com/package/react-dropzone (will need some styling)
-    //  and this: https://www.npmjs.com/package/react-cropper
     const PhotoUploadFlow = lazy(() => import('../utils/PhotoUploadFlow'))
-    const cropRef = createRef<ReactCropperElement>()
+    const imageRef = createRef<HTMLImageElement>()
     const [error, setError] = useState("")
+    const [completeCrop, setCompleteCrop] = useState<PixelCrop>()
+    const [photo, setPhoto] = useState<string>()
+    const [rotation, setRotation] = useState<number>(0)
+
+    useEffect(() => {
+        setError("")
+    }, [props.open])
 
     // on ok clicked, call this
-    const doCrop = () => {
-        if (cropRef.current?.cropper) {
-            props.onDone(cropRef.current?.cropper.getCroppedCanvas().toDataURL());
+    const doCrop = async () => {
+        if (completeCrop && photo && imageRef.current) {
+            const image = imageRef.current
+            const canvas = document.createElement('canvas')
+            const ctx = canvas.getContext('2d', {alpha: true})
+            if (!ctx) {
+                setError('Unable to get rendering context. Try a different browser')
+                return
+            }
+
+            canvas.width = completeCrop.width
+            canvas.height = completeCrop.height
+
+            const rotateRads = rotation * Math.PI / 180
+            const centerX = image.naturalWidth / 2
+            const centerY = image.naturalHeight / 2
+
+            ctx.save()
+            // 5) Move the crop origin to the canvas origin (0,0)
+            ctx.translate(-completeCrop.x, -completeCrop.y)
+            // 4) Move the origin to the center of the original position
+            ctx.translate(centerX, centerY)
+            // 3) Rotate around the origin
+            ctx.rotate(rotateRads)
+            // 2) skip scaling because the backend will resize it to 128 x 128
+            // ctx.scale(scale, scale)
+            // 1) Move the center of the image to the origin (0,0)
+            ctx.translate(-centerX, -centerY)
+            ctx.drawImage(
+                image,
+                0,
+                0,
+                image.naturalWidth,
+                image.naturalHeight,
+                0,
+                0,
+                image.naturalWidth,
+                image.naturalHeight,
+            )
+
+            // not really sure why the save() and restore() calls are here but ¯\_(ツ)_/¯
+            ctx.restore()
+            const photoString = canvas.toDataURL()
+            // todo upload photo - display loading symbol
+            props.onDone(photoString)
         } else {
             setError("Select a photo")
         }
     }
 
     return (
-        <Dialog open={props.open}>
+        <Dialog open={props.open} onClose={props.onCancel} PaperProps={{
+            sx: {
+                maxHeight: '90vh'
+            }
+        }}>
             <DialogTitle>Upload photo</DialogTitle>
-            <DialogContent>
-                {Boolean(error) && <Typography variant={'subtitle1'} color={'error'}>{error}</Typography>}
+            <DialogContent style={{overflow: "hidden"}}>
+                {Boolean(error) && <Typography style={{textAlign: 'center'}} variant={'subtitle1'} color={'error'}>{error}</Typography>}
                 <Suspense fallback={<CircularProgress />}>
-                    <PhotoUploadFlow innerRef={cropRef}/>
+                    <PhotoUploadFlow onCrop={setCompleteCrop} photo={photo} setPhoto={setPhoto} rotation={rotation} setRotation={setRotation} imgRef={imageRef}/>
                 </Suspense>
             </DialogContent>
             <DialogActions>
@@ -315,7 +365,7 @@ function UsernamePreference(props: { userInfo: Awaited<AxiosResponse<APIResult<U
             style={{width: "100%", height: "100%"}}
             />
     )
-    return (<SplitPreference small={
+    return (<div><SplitPreference small={
         <ShareButton text={`Add me on Attention! https://attention.aracroproducts.com/app/add?username=${username}`}/>
     } large={<DialogPreference<string> dialog={(props: DialogProps<string>) => (
         <Dialog open={props.open} onClose={(e) => {
@@ -371,15 +421,16 @@ function UsernamePreference(props: { userInfo: Awaited<AxiosResponse<APIResult<U
 
                 <PhotoElement/>
             </IconButton>
-            <PhotoSelectDialog onDone={(photo) => {
-                // todo upload photo
-                setPhotoDialog(false)
-            }} onCancel={() => {
-                setPhotoDialog(false)
-            }} open={photoDialog}/>
         </div>
 
-    }/>}/>)
+    }/>}/>
+        <PhotoSelectDialog onDone={(photo) => {
+            // todo upload photo
+            setPhotoDialog(false)
+        }} onCancel={() => {
+            setPhotoDialog(false)
+        }} open={photoDialog}/>
+    </div>)
 }
 
 // How to handle large screens:

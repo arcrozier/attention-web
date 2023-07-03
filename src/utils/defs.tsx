@@ -57,11 +57,13 @@ const MUnstyledButton = styled(ButtonBase)<ButtonProps>(({theme}) => {
             '@media (hover: none)': {
                 backgroundColor: 'transparent',
             },
+        }
     }
-}})
+})
 
 export const UnstyledButton = ({focusRipple, ...props}: ButtonProps) => {
     return (
-        <MUnstyledButton focusRipple={focusRipple !== undefined ? focusRipple : true} {...props}>{props.children}</MUnstyledButton>
+        <MUnstyledButton
+            focusRipple={focusRipple !== undefined ? focusRipple : true} {...{component: 'div', ...props}}>{props.children}</MUnstyledButton>
     )
 }

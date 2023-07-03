@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import {Close} from "@mui/icons-material";
 import {SESSION_ID_COOKIE} from "./utils/defs";
-import './animations.css'
+import './css/animations.css'
 
 export interface Properties {
     darkMode: boolean,
